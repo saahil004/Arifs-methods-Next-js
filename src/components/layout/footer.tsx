@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FaTwitter, FaFacebookF, FaDribbble, FaInstagram, FaYoutube } from "react-icons/fa";
 import { siteConfig } from "@/lib/site-config";
+import NewsletterForm from "./newsletter-form";
 
 const socials = [
   { icon: FaTwitter, label: "Twitter", href: siteConfig.social.twitter },
@@ -73,20 +74,7 @@ export default function Footer() {
           <p className="mt-4 text-white/60">
             Subscribe to get updates on new courses and results delivered to you.
           </p>
-          <form className="mt-4 flex" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              required
-              placeholder="Email Address"
-              className="w-full min-w-0 rounded-l-full bg-white/10 px-5 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="shrink-0 rounded-r-full bg-amber px-6 py-3 text-sm font-bold text-navy transition-colors hover:bg-amber/90"
-            >
-              Join
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
       </div>
     </footer>

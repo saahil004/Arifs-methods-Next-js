@@ -76,7 +76,15 @@ export default function RegisterForm() {
         className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
       />
       <input type="text" name="name" required placeholder="Full Name" className={inputClasses} />
-      <input type="tel" name="phone" required placeholder="Phone Number" className={inputClasses} />
+      <input
+        type="tel"
+        name="phone"
+        required
+        placeholder="Phone Number"
+        pattern="\+?[0-9\s-]{7,20}"
+        title="Please enter a valid phone number"
+        className={inputClasses}
+      />
       <input type="email" name="email" placeholder="Email (optional)" className={inputClasses} />
       <select
         name="level"

@@ -8,7 +8,7 @@ export const siteConfig = {
     phone: "+92 300 9245315",
     phoneHref: "tel:+923009245315",
     address: {
-      line1: "Flat No. C-7, Jason Luxury Condominium",
+      line1: "Jason Luxury Condominium",
       line2: "Block 7, Zone C, Block 7 Clifton, Karachi 75600",
     },
     hours: "Mon–Sat: 3:00 PM – 7:00 PM (Sunday Closed)",
