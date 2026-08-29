@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 
@@ -12,6 +12,7 @@ const inputClasses =
 type Status = "idle" | "submitting" | "success" | "error";
 
 export default function RegisterForm() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [level, setLevel] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,6 +44,16 @@ export default function RegisterForm() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    // Swapping the full form out for the short success message shrinks the
+    // page a lot, so without this the user's scroll offset ends up pointing
+    // at whatever content (often the footer) now sits at that same pixel
+    // position instead of the confirmation.
+    if (status === "success") {
+      containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [status]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -88,7 +99,7 @@ export default function RegisterForm() {
 
   if (status === "success") {
     return (
-      <div className="mt-8 rounded-xl bg-amber/10 p-6 text-center">
+      <div ref={containerRef} className="mt-8 rounded-xl bg-amber/10 p-6 text-center">
         <p className="font-bold text-navy">Thanks for registering!</p>
         <p className="mt-2 text-navy/60">We&apos;ve received your details and will get in touch soon.</p>
       </div>
@@ -96,7 +107,11 @@ export default function RegisterForm() {
   }
 
   return (
-    <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+    <form
+      ref={containerRef as unknown as React.RefObject<HTMLFormElement | null>}
+      className="mt-8 space-y-4"
+      onSubmit={handleSubmit}
+    >
       <input
         type="text"
         name="website"
