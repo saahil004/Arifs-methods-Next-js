@@ -120,7 +120,14 @@ export default function RegisterForm() {
         aria-hidden="true"
         className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
       />
-      <input type="text" name="name" required placeholder="Full Name" className={inputClasses} />
+      <input
+        type="text"
+        name="name"
+        required
+        placeholder="Full Name"
+        className={inputClasses}
+        data-clarity-mask="true"
+      />
       <input
         type="tel"
         name="phone"
@@ -129,8 +136,15 @@ export default function RegisterForm() {
         pattern="\+?[0-9\s-]{7,20}"
         title="Please enter a valid phone number"
         className={inputClasses}
+        data-clarity-mask="true"
       />
-      <input type="email" name="email" placeholder="Email (optional)" className={inputClasses} />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email (optional)"
+        className={inputClasses}
+        data-clarity-mask="true"
+      />
       <select
         name="level"
         required
@@ -183,6 +197,7 @@ export default function RegisterForm() {
         rows={4}
         placeholder="Anything else we should know? (optional)"
         className={inputClasses}
+        data-clarity-mask="true"
       />
 
       {status === "error" && <p className="text-sm text-red-600">{errorMessage}</p>}

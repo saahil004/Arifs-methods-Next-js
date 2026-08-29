@@ -65,6 +65,7 @@ export default function NewsletterForm() {
           required
           placeholder="Email Address"
           className="w-full min-w-0 rounded-l-full bg-white/10 px-5 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none"
+          data-clarity-mask="true"
         />
         <button
           type="submit"
