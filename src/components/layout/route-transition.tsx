@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/lib/site-config";
 
-const MIN_VISIBLE_MS = 800;
+const VISIBLE_MS = 800;
 
 export default function RouteTransition() {
-  const pathname = usePathname();
+  // Deliberately does NOT show on initial mount — that case (opening the
+  // site fresh, including a hard-reloaded 404) is handled by the pure-CSS
+  // .splash-overlay baked directly into the server-rendered HTML in
+  // layout.tsx, which appears instantly with no hydration delay. This
+  // component only handles click-triggered client-side navigation.
   const [isNavigating, setIsNavigating] = useState(false);
-  const shownAtRef = useRef<number | null>(null);
-  const isNavigatingRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -32,27 +33,25 @@ export default function RouteTransition() {
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname) return;
 
-      shownAtRef.current = Date.now();
-      isNavigatingRef.current = true;
+      // Scheduled unconditionally, independent of whether the destination
+      // page actually finishes loading or the router fires any particular
+      // event afterward. That's deliberate: this used to clear itself by
+      // watching for the pathname to change, but browser back/forward
+      // navigation doesn't reliably trigger that in every case, which left
+      // the overlay stuck on screen forever. A fixed timer can't get stuck —
+      // worst case it just doesn't line up perfectly with a slow navigation,
+      // which isn't a concern on a fully static, near-instant site like this.
       setIsNavigating(true);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => setIsNavigating(false), VISIBLE_MS);
     }
 
     document.addEventListener("click", handleClick, { capture: true });
-    return () => document.removeEventListener("click", handleClick, { capture: true });
+    return () => {
+      document.removeEventListener("click", handleClick, { capture: true });
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
   }, []);
-
-  useEffect(() => {
-    if (!isNavigatingRef.current) return;
-    const elapsed = shownAtRef.current ? Date.now() - shownAtRef.current : 0;
-    const remaining = Math.max(MIN_VISIBLE_MS - elapsed, 0);
-
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => {
-      isNavigatingRef.current = false;
-      setIsNavigating(false);
-    }, remaining);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
 
   return (
     <AnimatePresence>

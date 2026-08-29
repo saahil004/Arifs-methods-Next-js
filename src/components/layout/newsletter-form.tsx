@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -36,6 +37,10 @@ export default function NewsletterForm() {
 
       setStatus("success");
       setMessage(data.alreadySubscribed ? "You're already subscribed!" : "Thanks for subscribing!");
+      if (!data.alreadySubscribed) {
+        trackEvent("newsletter_signup");
+        trackMetaEvent("Subscribe");
+      }
       form.reset();
     } catch {
       setMessage("Couldn't reach the server. Please try again.");

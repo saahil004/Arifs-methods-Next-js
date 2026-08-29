@@ -21,3 +21,69 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Splash overlay shown on every fresh page load (not client-side
+   navigation). Pure CSS and baked into the server-rendered HTML on purpose —
+   it has to be visible in the very first paint, before React hydrates,
+   otherwise the real page flashes first and the "loading" screen would
+   cover already-visible content instead of the other way around. */
+@keyframes splash-fade-out {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes splash-logo-pop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes splash-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  pointer-events: none;
+  animation: splash-fade-out 800ms ease-out forwards;
+}
+
+.splash-overlay img {
+  animation: splash-logo-pop 500ms ease-out both;
+}
+
+.splash-overlay p {
+  opacity: 0;
+  animation: splash-text-in 400ms ease-out 300ms forwards;
+}

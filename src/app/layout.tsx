@@ -5,6 +5,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from "@/components/layout/scroll-to-top";
 import RouteTransition from "@/components/layout/route-transition";
+import Analytics from "@/components/analytics";
 import { HeaderThemeProvider } from "@/components/layout/header-theme";
 import { siteConfig } from "@/lib/site-config";
 
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Analytics />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -86,6 +88,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <ScrollToTop />
         <RouteTransition />
+        <div className="splash-overlay" aria-hidden="true">
+          <img src="/logo-icon.svg" alt="" className="h-36 w-36" />
+          <p className="font-display mt-4 text-2xl uppercase tracking-wide text-navy">{siteConfig.name}</p>
+        </div>
       </body>
     </html>
   );
