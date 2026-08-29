@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from "@/components/layout/scroll-to-top";
+import RouteTransition from "@/components/layout/route-transition";
 import { HeaderThemeProvider } from "@/components/layout/header-theme";
 import { siteConfig } from "@/lib/site-config";
 
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </HeaderThemeProvider>
         <Footer />
         <ScrollToTop />
+        <RouteTransition />
       </body>
     </html>
   );
