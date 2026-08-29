@@ -23,7 +23,7 @@ export default function InfoDrawer() {
 
       <Drawer isOpen={isOpen} close={() => setIsOpen(false)} place="right">
         <p className="mb-10 leading-relaxed text-white/60">
-          {siteConfig.tagline}
+          {siteConfig.description}
         </p>
 
         <div className="mb-10">
@@ -40,6 +40,7 @@ export default function InfoDrawer() {
               {siteConfig.contact.phone}
             </a>
           </div>
+          <p className="mt-4 text-white/60">{siteConfig.contact.hours}</p>
         </div>
 
         <div className="mb-10">

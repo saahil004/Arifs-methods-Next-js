@@ -8,7 +8,7 @@ const features = [
     icon: GraduationCap,
     title: "Expert Teachers",
     description:
-      "Learn from experienced O & A Level educators who know exactly what examiners look for.",
+      "Learn from experienced O & A Level educators, including Sir Arif, our Mathematics specialist known for his step-by-step teaching approach.",
   },
   {
     icon: BookOpen,
