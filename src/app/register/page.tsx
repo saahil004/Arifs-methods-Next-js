@@ -13,8 +13,8 @@ export default function RegisterPage() {
     <main>
       <PageBanner title="Register" breadcrumb={[{ label: "Home", href: "/" }, { label: "Register" }]} />
 
-      <section className="mx-auto max-w-5xl px-6 py-20">
-        <div className="grid overflow-hidden rounded-3xl shadow-xl lg:grid-cols-2">
+      <section className="mx-auto max-w-5xl px-6 pb-20">
+        <div className="-mt-20 grid overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
           <div className="relative hidden min-h-[420px] lg:block">
             <Image
               src="/register.jpg"

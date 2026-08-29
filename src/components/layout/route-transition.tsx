@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { siteConfig } from "@/lib/site-config";
 
-const MIN_VISIBLE_MS = 500;
+const MIN_VISIBLE_MS = 800;
 
 export default function RouteTransition() {
   const pathname = usePathname();
@@ -56,38 +57,31 @@ export default function RouteTransition() {
   return (
     <AnimatePresence>
       {isNavigating && (
-        <>
-          <motion.div
-            key="bar"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="pointer-events-none fixed inset-x-0 top-0 z-100 h-1 overflow-hidden bg-amber/20"
+        <motion.div
+          key="overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-white"
+        >
+          <motion.img
+            src="/logo-icon.svg"
+            alt=""
+            className="h-36 w-36"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: [0.7, 1.1, 1], opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+          <motion.p
+            className="font-display mt-4 text-2xl uppercase tracking-wide text-navy"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
           >
-            <motion.div
-              className="h-full bg-amber"
-              initial={{ width: "0%" }}
-              animate={{ width: "90%" }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            />
-          </motion.div>
-
-          <motion.div
-            key="badge"
-            initial={{ opacity: 0, scale: 0.5, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="pointer-events-none fixed right-6 top-4 z-100 flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md"
-          >
-            <motion.img
-              src="/logo-icon.svg"
-              alt=""
-              className="h-5 w-5"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
-        </>
+            {siteConfig.name}
+          </motion.p>
+        </motion.div>
       )}
     </AnimatePresence>
   );
