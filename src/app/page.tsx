@@ -1,6 +1,7 @@
 import Hero from "@/components/sections/hero";
 import Features from "@/components/sections/features";
 import HowItWorks from "@/components/sections/how-it-works";
+import WhyChooseUs from "@/components/sections/why-choose-us";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       />
       <Features />
       <HowItWorks />
+      <WhyChooseUs />
     </main>
   );
 }

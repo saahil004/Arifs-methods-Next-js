@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { motion, type Variants } from "framer-motion";
 
 const steps = [
   {
@@ -21,11 +24,27 @@ const steps = [
   },
 ];
 
+const container: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 export default function HowItWorks() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24">
       <div className="grid items-center gap-16 lg:grid-cols-2">
-        <div className="relative">
+        <motion.div
+          className="relative"
+          initial={{ opacity: 0, scale: 0.92 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           <div
             className="absolute -left-4 -top-4 h-32 w-32 text-amber/50"
             style={{
@@ -36,27 +55,36 @@ export default function HowItWorks() {
           <div className="absolute inset-0 -z-10 translate-x-6 translate-y-6 rounded-3xl bg-amber/10" />
           <div className="relative overflow-hidden rounded-3xl">
             <Image
-              src="/hero.jpg"
-              alt="Student studying with a tutor"
-              width={860}
-              height={459}
+              src="/how-it-works.jpg"
+              alt="Study desk with O & A Level books, past papers and a goals notebook"
+              width={768}
+              height={512}
+              sizes="(min-width: 1024px) 500px, 90vw"
               className="h-auto w-full object-cover"
             />
           </div>
-        </div>
+        </motion.div>
 
-        <div>
-          <p className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <motion.p
+            variants={item}
+            className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"
+          >
             <span className="h-px w-6 bg-amber" />
             How It Works
-          </p>
-          <h2 className="max-w-md text-3xl font-extrabold leading-tight text-navy sm:text-4xl">
+          </motion.p>
+          <motion.h2 variants={item} className="max-w-md text-3xl font-extrabold leading-tight text-navy sm:text-4xl">
             Three simple steps to getting started.
-          </h2>
+          </motion.h2>
 
           <ol className="mt-10 space-y-8">
             {steps.map((step) => (
-              <li key={step.number} className="flex gap-5">
+              <motion.li key={step.number} variants={item} className="flex gap-5">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber/15 font-bold text-navy">
                   {step.number}
                 </span>
@@ -64,10 +92,10 @@ export default function HowItWorks() {
                   <h3 className="font-bold text-navy">{step.title}</h3>
                   <p className="mt-1 leading-relaxed text-navy/60">{step.description}</p>
                 </div>
-              </li>
+              </motion.li>
             ))}
           </ol>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
