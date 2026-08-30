@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -15,6 +16,7 @@ import {
   type Level,
 } from "@/lib/admin-api";
 import AdminModal from "@/components/admin/admin-modal";
+import { fadeUpStagger } from "@/lib/motion";
 
 const inputClasses =
   "w-full rounded-xl border border-navy/15 px-4 py-3 text-navy placeholder:text-navy/40 focus:border-amber focus:outline-none";
@@ -106,8 +108,15 @@ export default function AdminCoursesPage() {
 
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
-      {groups.map(({ level, items }) => (
-        <div key={level} className="mt-6 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+      {groups.map(({ level, items }, idx) => (
+        <motion.div
+          key={level}
+          custom={idx}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUpStagger}
+          className="mt-6 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+        >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-extrabold text-navy">{level}</h2>
             <span className="rounded-full bg-navy/10 px-3 py-1 text-sm font-bold text-navy">
@@ -195,7 +204,7 @@ export default function AdminCoursesPage() {
               </div>
             </>
           )}
-        </div>
+        </motion.div>
       ))}
 
       <AdminModal

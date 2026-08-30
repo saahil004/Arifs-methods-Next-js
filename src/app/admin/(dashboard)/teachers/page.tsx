@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -16,6 +17,7 @@ import {
   type Course,
 } from "@/lib/admin-api";
 import AdminModal from "@/components/admin/admin-modal";
+import { fadeUpStagger } from "@/lib/motion";
 
 const inputClasses =
   "w-full rounded-xl border border-navy/15 px-4 py-3 text-navy placeholder:text-navy/40 focus:border-amber focus:outline-none";
@@ -103,9 +105,10 @@ export default function AdminTeachersPage() {
       {teachers && teachers.length === 0 && <p className="mt-8 text-center text-navy/40">No teachers yet.</p>}
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {teachers?.map((t) => (
+        {teachers?.map((t, idx) => (
           <TeacherCard
             key={t.id}
+            index={idx}
             teacher={t}
             deleting={deletingId === t.id}
             onEdit={() => setModalTeacher(t)}
@@ -135,18 +138,28 @@ export default function AdminTeachersPage() {
 }
 
 function TeacherCard({
+  index,
   teacher,
   deleting,
   onEdit,
   onDelete,
 }: {
+  index: number;
   teacher: Teacher;
   deleting: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }) {
   return (
-    <div className="flex flex-col rounded-3xl border border-navy/10 bg-white p-6 shadow-sm">
+    <motion.div
+      custom={index}
+      initial="hidden"
+      animate="visible"
+      variants={fadeUpStagger}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="flex flex-col rounded-3xl border border-navy/10 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md"
+    >
       <div className="flex items-start gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-navy/10">
           {teacher.photoUrl ? (
@@ -194,7 +207,7 @@ function TeacherCard({
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

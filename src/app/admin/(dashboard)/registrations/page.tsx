@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Search, Phone, Mail, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -12,6 +13,7 @@ import {
   type Registration,
   type Level,
 } from "@/lib/admin-api";
+import { fadeUp, fadeUpStagger } from "@/lib/motion";
 
 type LevelFilter = "all" | Level;
 const UNSPECIFIED_GROUP = "No subject selected";
@@ -330,7 +332,12 @@ export default function AdminRegistrationsPage() {
 
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
-      <div className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+      >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-navy/30" />
@@ -353,14 +360,21 @@ export default function AdminRegistrationsPage() {
             <option value="A Level">A Level</option>
           </select>
         </div>
-      </div>
+      </motion.div>
 
       {registrations && groups.length === 0 && (
         <p className="mt-8 text-center text-navy/40">No registrations match your filters.</p>
       )}
 
-      {groups.map(([subject, group]) => (
-        <div key={subject} className="mt-6 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+      {groups.map(([subject, group], idx) => (
+        <motion.div
+          key={subject}
+          custom={idx}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUpStagger}
+          className="mt-6 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+        >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-extrabold text-navy">{subject}</h2>
             <span className="rounded-full bg-navy/10 px-3 py-1 text-sm font-bold text-navy">
@@ -420,7 +434,7 @@ export default function AdminRegistrationsPage() {
               />
             ))}
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

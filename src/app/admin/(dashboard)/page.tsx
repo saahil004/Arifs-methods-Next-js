@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
+import { motion, animate, useMotionValue, useTransform } from "framer-motion";
 import { ClipboardList, Mail, BookOpen, GraduationCap, Users, Activity, Eye } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -12,6 +13,7 @@ import {
   fetchAnalyticsOverview,
   UnauthorizedError,
 } from "@/lib/admin-api";
+import { fadeUpStagger } from "@/lib/motion";
 
 type Stats = {
   registrations: number;
@@ -102,47 +104,91 @@ export default function AdminDashboardPage() {
 
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
-      <Section title="Overview">
-        <StatTile icon={ClipboardList} label="Registrations" value={stats?.registrations} accent="navy" />
-        <StatTile icon={Mail} label="Newsletter Subscribers" value={stats?.subscribers} accent="navy" />
-        <StatTile icon={BookOpen} label="Courses" value={stats?.courses} accent="navy" />
-        <StatTile icon={GraduationCap} label="Teachers" value={stats?.teachers} accent="navy" />
+      <Section index={0} title="Overview">
+        <StatTile index={0} icon={ClipboardList} label="Registrations" value={stats?.registrations} accent="navy" />
+        <StatTile index={1} icon={Mail} label="Newsletter Subscribers" value={stats?.subscribers} accent="navy" />
+        <StatTile index={2} icon={BookOpen} label="Courses" value={stats?.courses} accent="navy" />
+        <StatTile index={3} icon={GraduationCap} label="Teachers" value={stats?.teachers} accent="navy" />
       </Section>
 
-      <Section title="Website Traffic" subtitle="Last 30 days, via Google Analytics">
-        <StatTile icon={Users} label="Active Users" value={analytics?.activeUsers} accent="amber" />
-        <StatTile icon={Activity} label="Sessions" value={analytics?.sessions} accent="amber" />
-        <StatTile icon={Eye} label="Page Views" value={analytics?.screenPageViews} accent="amber" />
+      <Section index={1} title="Website Traffic" subtitle="Last 30 days, via Google Analytics">
+        <StatTile index={0} icon={Users} label="Active Users" value={analytics?.activeUsers} accent="amber" />
+        <StatTile index={1} icon={Activity} label="Sessions" value={analytics?.sessions} accent="amber" />
+        <StatTile index={2} icon={Eye} label="Page Views" value={analytics?.screenPageViews} accent="amber" />
       </Section>
     </div>
   );
 }
 
-function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function Section({
+  index,
+  title,
+  subtitle,
+  children,
+}: {
+  index: number;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+    <motion.div
+      custom={index}
+      initial="hidden"
+      animate="visible"
+      variants={fadeUpStagger}
+      className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+    >
       <div className="mb-6">
         <h2 className="text-lg font-extrabold text-navy">{title}</h2>
         {subtitle && <p className="text-sm text-navy/50">{subtitle}</p>}
       </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{children}</div>
-    </div>
+    </motion.div>
   );
 }
 
+function AnimatedNumber({ value }: { value: number }) {
+  const motionValue = useMotionValue(0);
+  const rounded = useTransform(motionValue, (v) => Math.round(v).toLocaleString());
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    const controls = animate(motionValue, value, { duration: 0.8, ease: "easeOut" });
+    const unsubscribe = rounded.on("change", setDisplay);
+    return () => {
+      controls.stop();
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  return <>{display}</>;
+}
+
 function StatTile({
+  index,
   icon: Icon,
   label,
   value,
   accent,
 }: {
+  index: number;
   icon: ComponentType<{ className?: string }>;
   label: string;
   value: number | undefined;
   accent: "navy" | "amber";
 }) {
   return (
-    <div className="rounded-2xl bg-cream p-5">
+    <motion.div
+      custom={index}
+      initial="hidden"
+      animate="visible"
+      variants={fadeUpStagger}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="rounded-2xl bg-cream p-5 shadow-sm transition-shadow duration-200 hover:shadow-md"
+    >
       <div
         className={`flex h-10 w-10 items-center justify-center rounded-full ${
           accent === "navy" ? "bg-navy/10 text-navy" : "bg-amber/20 text-navy"
@@ -151,7 +197,9 @@ function StatTile({
         <Icon className="h-5 w-5" />
       </div>
       <p className="mt-4 text-sm font-bold text-navy/50">{label}</p>
-      <p className="mt-1 text-3xl font-extrabold text-navy">{value ?? "—"}</p>
-    </div>
+      <p className="mt-1 text-3xl font-extrabold text-navy">
+        {value !== undefined ? <AnimatedNumber value={value} /> : "—"}
+      </p>
+    </motion.div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Search, Paperclip, X, Trash2 } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -11,6 +12,7 @@ import {
   UnauthorizedError,
   type Subscriber,
 } from "@/lib/admin-api";
+import { fadeUpStagger } from "@/lib/motion";
 
 const inputClasses =
   "w-full rounded-xl border border-navy/15 px-4 py-3 text-navy placeholder:text-navy/40 focus:border-amber focus:outline-none";
@@ -96,7 +98,13 @@ export default function AdminNewsletterPage() {
 
       <SendEmailCard token={token} subscriberCount={subscribers?.length ?? 0} onUnauthorized={handleUnauthorized} />
 
-      <div className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+      <motion.div
+        custom={1}
+        initial="hidden"
+        animate="visible"
+        variants={fadeUpStagger}
+        className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+      >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-navy/30" />
@@ -165,7 +173,7 @@ export default function AdminNewsletterPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -229,7 +237,13 @@ function SendEmailCard({
   const canSend = subject.trim().length > 0 && message.trim().length > 0 && subscriberCount > 0;
 
   return (
-    <div className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8">
+    <motion.div
+      custom={0}
+      initial="hidden"
+      animate="visible"
+      variants={fadeUpStagger}
+      className="mt-8 rounded-3xl border border-navy/10 bg-white p-6 shadow-sm sm:p-8"
+    >
       <h2 className="text-lg font-extrabold text-navy">Send an Email</h2>
       <p className="text-sm text-navy/50">
         This goes out to all {subscriberCount} subscriber{subscriberCount === 1 ? "" : "s"}.
@@ -287,6 +301,6 @@ function SendEmailCard({
           {status === "sending" ? "Sending..." : `Send to ${subscriberCount} Subscriber${subscriberCount === 1 ? "" : "s"}`}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }
