@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, Phone, Mail, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -150,35 +150,45 @@ function MobileRegistrationRow({
         <ChevronDown className={`h-4 w-4 shrink-0 text-navy/40 transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
 
-      {expanded && (
-        <div className="mt-3 space-y-2 text-sm">
-          <p>
-            <span className="text-navy/50">Phone: </span>
-            <span className="text-navy">{registration.phone}</span>
-          </p>
-          <p>
-            <span className="text-navy/50">Email: </span>
-            <span className="text-navy">{registration.email || "—"}</span>
-          </p>
-          <p>
-            <span className="text-navy/50">Level: </span>
-            <span className="text-navy">{registration.level}</span>
-          </p>
-          <p>
-            <span className="text-navy/50">Registered: </span>
-            <span className="text-navy">{formatDate(registration.created_at)}</span>
-          </p>
-          <div className="flex items-center gap-2 pt-1">
-            <ContactButtons registration={registration} />
-            <ArchiveButton
-              registration={registration}
-              isArchived={isArchived}
-              onArchive={onArchive}
-              onUnarchive={onUnarchive}
-            />
-          </div>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 space-y-2 text-sm">
+              <p>
+                <span className="text-navy/50">Phone: </span>
+                <span className="text-navy">{registration.phone}</span>
+              </p>
+              <p>
+                <span className="text-navy/50">Email: </span>
+                <span className="text-navy">{registration.email || "—"}</span>
+              </p>
+              <p>
+                <span className="text-navy/50">Level: </span>
+                <span className="text-navy">{registration.level}</span>
+              </p>
+              <p>
+                <span className="text-navy/50">Registered: </span>
+                <span className="text-navy">{formatDate(registration.created_at)}</span>
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <ContactButtons registration={registration} />
+                <ArchiveButton
+                  registration={registration}
+                  isArchived={isArchived}
+                  onArchive={onArchive}
+                  onUnarchive={onUnarchive}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

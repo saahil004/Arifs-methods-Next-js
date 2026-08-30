@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import Drawer from "@/components/ui/drawer";
 import AnimatedLink from "@/components/ui/animated-link";
+import { fadeUpStagger } from "@/lib/motion";
 
 const links = [
   { label: "Dashboard", href: "/admin" },
@@ -66,21 +68,27 @@ export default function AdminNav() {
         <Drawer isOpen={isOpen} close={() => setIsOpen(false)} place="left">
           <nav>
             <ul className="space-y-6">
-              {links.map((link) => (
-                <li key={link.href}>
+              {links.map((link, idx) => (
+                <motion.li key={link.href} custom={idx} initial="hidden" animate="visible" variants={fadeUpStagger}>
                   <AnimatedLink href={link.href} className="text-lg font-bold" onClick={() => setIsOpen(false)}>
                     {link.label}
                   </AnimatedLink>
-                </li>
+                </motion.li>
               ))}
-              <li className="pt-2">
+              <motion.li
+                custom={links.length}
+                initial="hidden"
+                animate="visible"
+                variants={fadeUpStagger}
+                className="pt-2"
+              >
                 <button
                   onClick={handleLogout}
                   className="rounded-full bg-amber px-6 py-2.5 text-base font-bold text-navy transition-colors hover:bg-amber/90"
                 >
                   Logout
                 </button>
-              </li>
+              </motion.li>
             </ul>
           </nav>
         </Drawer>

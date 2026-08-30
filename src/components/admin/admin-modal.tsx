@@ -33,7 +33,13 @@ export default function AdminModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy/40 p-4"
+          // items-start (not items-center) deliberately: a centered flex
+          // item taller than the viewport can't be scrolled to reveal its
+          // top edge in most browsers — the header ends up permanently
+          // cut off above the visible area. Top-aligning with vertical
+          // padding keeps short forms looking centered-ish while tall ones
+          // (e.g. the teacher form with the photo section) stay scrollable.
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/40 px-4 py-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

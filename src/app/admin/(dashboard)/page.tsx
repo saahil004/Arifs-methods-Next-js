@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
-import { motion, animate, useMotionValue, useTransform } from "framer-motion";
+import { motion, animate } from "framer-motion";
 import { ClipboardList, Mail, BookOpen, GraduationCap, Users, Activity, Eye } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
@@ -149,21 +149,24 @@ function Section({
 }
 
 function AnimatedNumber({ value }: { value: number }) {
-  const motionValue = useMotionValue(0);
-  const rounded = useTransform(motionValue, (v) => Math.round(v).toLocaleString());
-  const [display, setDisplay] = useState("0");
+  // Writes straight to the DOM via a ref instead of React state on every
+  // tick — a per-frame setState here was heavy enough to visibly compete
+  // with (and jank) the full-screen route-transition animation that's
+  // often still running when a dashboard visit lands.
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const controls = animate(motionValue, value, { duration: 0.8, ease: "easeOut" });
-    const unsubscribe = rounded.on("change", setDisplay);
-    return () => {
-      controls.stop();
-      unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const controls = animate(0, value, {
+      duration: 0.8,
+      ease: "easeOut",
+      onUpdate: (v) => {
+        if (ref.current) ref.current.textContent = Math.round(v).toLocaleString();
+      },
+    });
+    return () => controls.stop();
   }, [value]);
 
-  return <>{display}</>;
+  return <span ref={ref}>0</span>;
 }
 
 function StatTile({
