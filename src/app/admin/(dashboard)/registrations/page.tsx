@@ -2,12 +2,112 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, Phone, Mail, ChevronDown } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { fetchRegistrations, UnauthorizedError, type Registration, type Level } from "@/lib/admin-api";
 
 type LevelFilter = "all" | Level;
 const UNSPECIFIED_GROUP = "No subject selected";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidEmail(email: string | null): email is string {
+  return !!email && EMAIL_REGEX.test(email);
+}
+
+// Registrations are validated on submission (the backend rejects anything
+// that doesn't match its own phone regex), but that just confirms the raw
+// text is plausible — it doesn't produce a dialable format. This normalizes
+// for the tel: link specifically (assuming a local Pakistani number when no
+// country code is given, matching the business's own market) and returns
+// null if the result still doesn't look like a real number, so a malformed
+// or legacy record doesn't render a broken Call button.
+function formatPhoneForTel(phone: string): string | null {
+  const digitsAndPlus = phone.replace(/[^\d+]/g, "");
+  const normalized = digitsAndPlus.startsWith("0")
+    ? `+92${digitsAndPlus.slice(1)}`
+    : digitsAndPlus.startsWith("+")
+      ? digitsAndPlus
+      : `+${digitsAndPlus}`;
+
+  const digitCount = normalized.replace(/\D/g, "").length;
+  if (digitCount < 8 || digitCount > 15) return null;
+  return normalized;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function ContactButtons({ registration }: { registration: Registration }) {
+  const tel = formatPhoneForTel(registration.phone);
+  const email = isValidEmail(registration.email) ? registration.email : null;
+
+  return (
+    <div className="flex items-center gap-2">
+      {tel && (
+        <a
+          href={`tel:${tel}`}
+          aria-label={`Call ${registration.name}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
+        >
+          <Phone className="h-4 w-4" />
+        </a>
+      )}
+      {email && (
+        <a
+          href={`mailto:${email}`}
+          aria-label={`Email ${registration.name}`}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
+        >
+          <Mail className="h-4 w-4" />
+        </a>
+      )}
+    </div>
+  );
+}
+
+function MobileRegistrationRow({ registration }: { registration: Registration }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="border-b border-navy/5 py-3 last:border-0">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="flex w-full items-center justify-between text-left"
+      >
+        <span className="font-bold text-navy">{registration.name}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-navy/40 transition-transform ${expanded ? "rotate-180" : ""}`} />
+      </button>
+
+      {expanded && (
+        <div className="mt-3 space-y-2 text-sm">
+          <p>
+            <span className="text-navy/50">Phone: </span>
+            <span className="text-navy">{registration.phone}</span>
+          </p>
+          <p>
+            <span className="text-navy/50">Email: </span>
+            <span className="text-navy">{registration.email || "—"}</span>
+          </p>
+          <p>
+            <span className="text-navy/50">Level: </span>
+            <span className="text-navy">{registration.level}</span>
+          </p>
+          <p>
+            <span className="text-navy/50">Registered: </span>
+            <span className="text-navy">{formatDate(registration.created_at)}</span>
+          </p>
+          <div className="pt-1">
+            <ContactButtons registration={registration} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminRegistrationsPage() {
   const router = useRouter();
@@ -122,7 +222,9 @@ export default function AdminRegistrationsPage() {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Desktop: full table. Below sm, five columns plus contact
+              buttons doesn't fit — a collapsible card list takes over instead. */}
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-navy/10 text-sm text-navy/50">
@@ -131,6 +233,9 @@ export default function AdminRegistrationsPage() {
                   <th className="pb-3 font-bold">Email</th>
                   <th className="pb-3 font-bold">Level</th>
                   <th className="pb-3 font-bold">Registered</th>
+                  <th className="pb-3 font-bold">
+                    <span className="sr-only">Contact</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -140,17 +245,20 @@ export default function AdminRegistrationsPage() {
                     <td className="py-3 text-navy/70">{r.phone}</td>
                     <td className="py-3 text-navy/70">{r.email || "—"}</td>
                     <td className="py-3 text-navy/70">{r.level}</td>
-                    <td className="py-3 text-navy/60">
-                      {new Date(r.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                    <td className="py-3 text-navy/60">{formatDate(r.created_at)}</td>
+                    <td className="py-3">
+                      <ContactButtons registration={r} />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="sm:hidden">
+            {group.map((r) => (
+              <MobileRegistrationRow key={r.id} registration={r} />
+            ))}
           </div>
         </div>
       ))}
