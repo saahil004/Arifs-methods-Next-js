@@ -134,9 +134,9 @@ export default function AdminCoursesPage() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-navy/10 text-sm text-navy/50">
-                      <th className="pb-3 font-bold">Code</th>
-                      <th className="pb-3 font-bold">Name</th>
-                      <th className="pb-3 font-bold">
+                      <th className="py-3 pr-3 font-bold">Code</th>
+                      <th className="px-3 py-3 font-bold">Name</th>
+                      <th className="py-3 pl-3 font-bold">
                         <span className="sr-only">Actions</span>
                       </th>
                     </tr>
@@ -144,9 +144,9 @@ export default function AdminCoursesPage() {
                   <tbody>
                     {items.map((c) => (
                       <tr key={c.id} className="border-b border-navy/5 last:border-0">
-                        <td className="py-3 text-navy/70">{c.code}</td>
-                        <td className="py-3 text-navy">{c.name}</td>
-                        <td className="py-3">
+                        <td className="py-3 pr-3 text-navy/70">{c.code}</td>
+                        <td className="px-3 py-3 text-navy">{c.name}</td>
+                        <td className="py-3 pl-3">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               type="button"

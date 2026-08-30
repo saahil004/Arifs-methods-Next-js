@@ -133,9 +133,9 @@ export default function AdminNewsletterPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-navy/10 text-sm text-navy/50">
-                <th className="pb-3 font-bold">Email</th>
-                <th className="pb-3 font-bold">Subscribed</th>
-                <th className="pb-3 font-bold">
+                <th className="py-3 pr-3 font-bold">Email</th>
+                <th className="px-3 py-3 font-bold">Subscribed</th>
+                <th className="py-3 pl-3 font-bold">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
@@ -143,15 +143,15 @@ export default function AdminNewsletterPage() {
             <tbody>
               {filtered.map((s) => (
                 <tr key={s.id} className="border-b border-navy/5 last:border-0">
-                  <td className="py-3 text-navy">{s.email}</td>
-                  <td className="py-3 text-navy/60">
+                  <td className="py-3 pr-3 text-navy">{s.email}</td>
+                  <td className="px-3 py-3 text-navy/60">
                     {new Date(s.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })}
                   </td>
-                  <td className="py-3 text-right">
+                  <td className="py-3 pl-3 text-right">
                     <button
                       onClick={() => handleDelete(s)}
                       disabled={deletingId === s.id}
