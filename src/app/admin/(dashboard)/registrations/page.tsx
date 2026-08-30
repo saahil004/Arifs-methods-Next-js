@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
@@ -127,22 +127,37 @@ function MobileRegistrationRow({
 type View = "active" | "archived";
 
 export default function AdminRegistrationsPage() {
+  // useSearchParams() requires a Suspense boundary — this is what makes
+  // `view` genuinely reactive to the admin nav's "Active"/"Archived"
+  // dropdown links. A one-time read of window.location at mount (the
+  // earlier approach) looked right locally but silently failed to update
+  // when clicking a different link while already on this page: Next.js
+  // reuses the same page instance for a query-string-only navigation, so a
+  // value only read once at mount never sees the change.
+  return (
+    <Suspense fallback={null}>
+      <AdminRegistrationsPageInner />
+    </Suspense>
+  );
+}
+
+function AdminRegistrationsPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { token, logout } = useAdminAuth();
   const [registrations, setRegistrations] = useState<Registration[] | null>(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
-  // Lets the admin nav's "Active"/"Archived" dropdown links deep-link
-  // straight into the matching view (?view=archived) instead of always
-  // landing on Active. Reads window directly rather than useSearchParams()
-  // to avoid that hook's Suspense-boundary requirement for a value this
-  // page only needs once, at mount.
-  const [view, setView] = useState<View>(() => {
-    if (typeof window === "undefined") return "active";
-    return new URLSearchParams(window.location.search).get("view") === "archived" ? "archived" : "active";
-  });
+  // The URL is the source of truth for which view is showing, not local
+  // state — so both the nav dropdown's links and the in-page toggle below
+  // (which now navigates instead of calling a setter) always agree.
+  const view: View = searchParams.get("view") === "archived" ? "archived" : "active";
   const [loadedView, setLoadedView] = useState<View>(view);
+
+  function setView(next: View) {
+    router.replace(`/admin/registrations?view=${next}`, { scroll: false });
+  }
 
   // Reset the stale list the instant `view` changes, during render rather
   // than in the effect below — this is React's supported pattern for

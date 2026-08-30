@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, Paperclip, X, Trash2 } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
@@ -30,9 +30,24 @@ const RECENCY_DAYS: Record<Exclude<RecencyFilter, "all">, number> = { "7": 7, "3
 type Tab = "send" | "queries";
 
 export default function AdminNewsletterPage() {
+  // useSearchParams() requires a Suspense boundary — this is what makes
+  // `tab` genuinely reactive to the admin nav's "Send Newsletter"/"Queries"
+  // dropdown links. A one-time effect reading window.location at mount (the
+  // earlier approach) silently failed to update when clicking a different
+  // link while already on this page: Next.js reuses the same page instance
+  // for a query-string-only navigation, so a value only read once at mount
+  // never sees the change.
+  return (
+    <Suspense fallback={null}>
+      <AdminNewsletterPageInner />
+    </Suspense>
+  );
+}
+
+function AdminNewsletterPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { token, logout } = useAdminAuth();
-  const [tab, setTab] = useState<Tab>("send");
   const [subscribers, setSubscribers] = useState<Subscriber[] | null>(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -42,16 +57,14 @@ export default function AdminNewsletterPage() {
   // must stay pure, and Date.now() is a fresh value on every call.
   const [now] = useState(() => Date.now());
 
-  // Lets the admin nav's "Queries" dropdown link deep-link straight into
-  // this tab (?tab=queries) without a separate route.
-  useEffect(() => {
-    // The URL's search params don't exist during server rendering, so this
-    // can only be read once mounted on the client — an effect is
-    // unavoidable here, same as admin-auth.tsx's localStorage read.
-    const params = new URLSearchParams(window.location.search);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (params.get("tab") === "queries") setTab("queries");
-  }, []);
+  // The URL is the source of truth, not local state — so both the nav
+  // dropdown's links and the in-page tab toggle (which now navigates
+  // instead of calling a setter) always agree.
+  const tab: Tab = searchParams.get("tab") === "queries" ? "queries" : "send";
+
+  function setTab(next: Tab) {
+    router.replace(next === "send" ? "/admin/newsletter" : `/admin/newsletter?tab=${next}`, { scroll: false });
+  }
 
   function handleUnauthorized() {
     logout();

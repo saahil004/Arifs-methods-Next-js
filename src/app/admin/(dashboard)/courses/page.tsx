@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
@@ -30,22 +30,39 @@ function sortCourses(courses: Course[]): Course[] {
 }
 
 export default function AdminCoursesPage() {
+  // useSearchParams() requires a Suspense boundary — this is what makes
+  // levelFilter genuinely reactive to the admin nav's "O Levels"/"A Levels"
+  // dropdown links. A one-time read of window.location at mount (the
+  // earlier approach) silently failed to update when clicking a different
+  // link while already on this page: Next.js reuses the same page instance
+  // for a query-string-only navigation, so a value only read once at mount
+  // never sees the change.
+  return (
+    <Suspense fallback={null}>
+      <AdminCoursesPageInner />
+    </Suspense>
+  );
+}
+
+function AdminCoursesPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { token, logout } = useAdminAuth();
   const [courses, setCourses] = useState<Course[] | null>(null);
   const [error, setError] = useState("");
   const [modalCourse, setModalCourse] = useState<Course | "new" | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  // Lets the admin nav's "O Levels"/"A Levels" dropdown links deep-link
-  // straight into a filtered view (?level=O%20Level) instead of always
-  // showing both. Reads window directly rather than useSearchParams() to
-  // avoid that hook's Suspense-boundary requirement for a value this page
-  // only needs once, at mount.
-  const [levelFilter, setLevelFilter] = useState<LevelFilter>(() => {
-    if (typeof window === "undefined") return "all";
-    const level = new URLSearchParams(window.location.search).get("level");
-    return level === "O Level" || level === "A Level" ? level : "all";
-  });
+  // The URL is the source of truth, not local state — so both the nav
+  // dropdown's links and the in-page filter tabs (which now navigate
+  // instead of calling a setter) always agree.
+  const levelParam = searchParams.get("level");
+  const levelFilter: LevelFilter = levelParam === "O Level" || levelParam === "A Level" ? levelParam : "all";
+
+  function setLevelFilter(next: LevelFilter) {
+    router.replace(next === "all" ? "/admin/courses" : `/admin/courses?level=${encodeURIComponent(next)}`, {
+      scroll: false,
+    });
+  }
 
   function handleUnauthorized() {
     logout();
