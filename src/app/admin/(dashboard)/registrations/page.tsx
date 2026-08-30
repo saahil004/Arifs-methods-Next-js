@@ -18,17 +18,30 @@ function isValidEmail(email: string | null): email is string {
 // Registrations are validated on submission (the backend rejects anything
 // that doesn't match its own phone regex), but that just confirms the raw
 // text is plausible — it doesn't produce a dialable format. This normalizes
-// for the tel: link specifically (assuming a local Pakistani number when no
-// country code is given, matching the business's own market) and returns
-// null if the result still doesn't look like a real number, so a malformed
-// or legacy record doesn't render a broken Call button.
+// for the tel: link specifically and returns null if the result still
+// doesn't look like a real number, so a malformed or legacy record doesn't
+// render a broken Call button.
+//
+// Known, accepted limitation: a number given in another country's LOCAL
+// format (a bare leading 0, no country code — e.g. a UK number written as
+// "07911123456") is indistinguishable from a Pakistani local number and
+// gets assumed to be Pakistani, since that's this business's near-exclusive
+// market. A number that already includes a country code (via "+" or "00")
+// is always handled correctly regardless of country.
 function formatPhoneForTel(phone: string): string | null {
   const digitsAndPlus = phone.replace(/[^\d+]/g, "");
-  const normalized = digitsAndPlus.startsWith("0")
-    ? `+92${digitsAndPlus.slice(1)}`
-    : digitsAndPlus.startsWith("+")
-      ? digitsAndPlus
-      : `+${digitsAndPlus}`;
+
+  let normalized: string;
+  if (digitsAndPlus.startsWith("+")) {
+    normalized = digitsAndPlus;
+  } else if (digitsAndPlus.startsWith("00")) {
+    // "00" is the common alternative to "+" for dialing internationally.
+    normalized = `+${digitsAndPlus.slice(2)}`;
+  } else if (digitsAndPlus.startsWith("0")) {
+    normalized = `+92${digitsAndPlus.slice(1)}`;
+  } else {
+    normalized = `+${digitsAndPlus}`;
+  }
 
   const digitCount = normalized.replace(/\D/g, "").length;
   if (digitCount < 8 || digitCount > 15) return null;

@@ -62,12 +62,20 @@ export default function RegisterForm() {
     setErrorMessage("");
 
     const formData = new FormData(form);
+    const subjects = formData.getAll("subjects");
+
+    if (subjects.length === 0) {
+      setErrorMessage("Please select at least one subject.");
+      setStatus("error");
+      return;
+    }
+
     const payload = {
       name: formData.get("name"),
       phone: formData.get("phone"),
       email: formData.get("email"),
       level: levelLabel,
-      subjects: formData.getAll("subjects"),
+      subjects,
       message: formData.get("message"),
       website: formData.get("website"),
     };
@@ -168,7 +176,7 @@ export default function RegisterForm() {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <p className="mb-2 text-sm font-bold text-navy">Subjects of Interest</p>
+            <p className="mb-2 text-sm font-bold text-navy">Subjects of Interest (select at least one)</p>
             <div className="rounded-xl border border-navy/15 p-4">
               {coursesLoading ? (
                 <p className="text-sm text-navy/40">Loading subjects...</p>
