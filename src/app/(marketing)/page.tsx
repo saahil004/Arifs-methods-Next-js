@@ -1,9 +1,9 @@
-import Hero from "@/components/sections/hero";
-import Features from "@/components/sections/features";
-import HowItWorks from "@/components/sections/how-it-works";
-import WhyChooseUs from "@/components/sections/why-choose-us";
-import QuoteBanner from "@/components/sections/quote-banner";
-import ContactCta from "@/components/sections/contact-cta";
+import Hero from "@/components/sections/home/hero";
+import Features from "@/components/sections/home/features";
+import HowItWorks from "@/components/sections/home/how-it-works";
+import WhyChooseUs from "@/components/sections/home/why-choose-us";
+import QuoteBanner from "@/components/sections/home/quote-banner";
+import ContactCta from "@/components/sections/home/contact-cta";
 
 export default function Home() {
   return (

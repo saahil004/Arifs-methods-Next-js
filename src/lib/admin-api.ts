@@ -59,10 +59,14 @@ export class UnauthorizedError extends Error {
 }
 
 async function adminFetch<T>(path: string, token: string, init?: RequestInit): Promise<T> {
+  // FormData bodies must NOT get a manual Content-Type — the browser sets its
+  // own multipart boundary, and overriding it here would break the upload.
+  const isFormData = init?.body instanceof FormData;
+
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
-      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...(init?.body && !isFormData ? { "Content-Type": "application/json" } : {}),
       ...init?.headers,
       Authorization: `Bearer ${token}`,
     },
@@ -98,6 +102,23 @@ export async function fetchRegistrations(token: string) {
 export async function fetchSubscribers(token: string) {
   const data = await adminFetch<{ subscribers: Subscriber[] }>("/api/newsletter", token);
   return data.subscribers;
+}
+
+export async function deleteSubscriber(token: string, id: string) {
+  await adminFetch(`/api/newsletter/${id}`, token, { method: "DELETE" });
+}
+
+export async function sendNewsletterBroadcast(token: string, subject: string, message: string, files: File[]) {
+  const formData = new FormData();
+  formData.append("subject", subject);
+  formData.append("message", message);
+  for (const file of files) formData.append("files", file);
+
+  const data = await adminFetch<{ sent: number; failedBatches: number }>("/api/newsletter/broadcast", token, {
+    method: "POST",
+    body: formData,
+  });
+  return data;
 }
 
 // Courses/teachers reads are public endpoints (the site's homepage and
@@ -154,4 +175,16 @@ export async function updateTeacher(token: string, id: string, input: TeacherInp
 
 export async function deleteTeacher(token: string, id: string) {
   await adminFetch(`/api/teachers/${id}`, token, { method: "DELETE" });
+}
+
+export type AnalyticsOverview = {
+  activeUsers: number;
+  newUsers: number;
+  sessions: number;
+  screenPageViews: number;
+  cached: boolean;
+};
+
+export async function fetchAnalyticsOverview(token: string) {
+  return adminFetch<AnalyticsOverview>("/api/analytics", token);
 }

@@ -9,13 +9,11 @@ export default function Drawer({
   isOpen,
   close,
   place = "right",
-  title = siteConfig.name,
   children,
 }: {
   isOpen: boolean;
   close: () => void;
   place?: "left" | "right";
-  title?: string;
   children: React.ReactNode;
 }) {
   const offset = place === "right" ? "100%" : "-100%";
@@ -56,12 +54,15 @@ export default function Drawer({
             exit={{ x: offset }}
             transition={{ type: "tween", ease: "easeInOut", duration: 0.35 }}
           >
-            <div className="mb-8 flex items-start justify-between">
-              <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+            <div className="mb-8 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img src="/logo-icon.svg" alt="" className="h-8 w-auto brightness-0 invert" />
+                <span className="text-lg font-bold tracking-tight text-white">{siteConfig.name}</span>
+              </div>
               <button
                 onClick={() => close()}
                 aria-label="Close"
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white/5 text-xl text-white transition hover:bg-white/10"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/5 text-xl text-white transition hover:bg-white/10"
               >
                 <X className="h-5 w-5" />
               </button>

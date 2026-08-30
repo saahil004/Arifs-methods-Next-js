@@ -6,16 +6,19 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { navLinks } from "@/lib/nav";
 import { useHeaderTheme } from "./header-theme";
+import { useCourseNavGroups } from "@/lib/use-course-nav-groups";
 
 export default function DesktopNav() {
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
   const { scrolled, onDarkBanner } = useHeaderTheme();
   const white = onDarkBanner && !scrolled;
+  const courseGroups = useCourseNavGroups();
+  const links = navLinks.map((link) => (link.label === "Courses" ? { ...link, groups: courseGroups } : link));
 
   return (
     <nav className="hidden md:flex md:gap-8 lg:gap-9">
-      {navLinks.map((link) => {
+      {links.map((link) => {
         const hasMega = !!link.groups?.length;
         const isOpen = openItem === link.label;
         const activeGroupData = link.groups?.find((g) => g.title === activeGroup);
@@ -93,7 +96,7 @@ export default function DesktopNav() {
                         >
                           <ul className="space-y-3">
                             {activeGroupData.items.map((item) => (
-                              <li key={item.href}>
+                              <li key={item.label}>
                                 <Link
                                   href={item.href}
                                   className="text-[15px] font-semibold text-navy hover:text-amber"

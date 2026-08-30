@@ -9,6 +9,12 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Needed because the app now has multiple root layouts (marketing + admin)
+  // — Next.js can't compose a single global 404 from either one alone, so
+  // this opts into the purpose-built replacement (see app/global-not-found.tsx).
+  experimental: {
+    globalNotFound: true,
+  },
   async headers() {
     return [
       {
