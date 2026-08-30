@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Phone, Mail, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
+import { Search, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
   fetchRegistrations,
@@ -14,80 +14,11 @@ import {
   type Level,
 } from "@/lib/admin-api";
 import { fadeUp, fadeUpStagger } from "@/lib/motion";
+import { formatDate } from "@/lib/format";
+import ContactButtons from "@/components/admin/contact-buttons";
 
 type LevelFilter = "all" | Level;
 const UNSPECIFIED_GROUP = "No subject selected";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function isValidEmail(email: string | null): email is string {
-  return !!email && EMAIL_REGEX.test(email);
-}
-
-// Registrations are validated on submission (the backend rejects anything
-// that doesn't match its own phone regex), but that just confirms the raw
-// text is plausible — it doesn't produce a dialable format. This normalizes
-// for the tel: link specifically and returns null if the result still
-// doesn't look like a real number, so a malformed or legacy record doesn't
-// render a broken Call button.
-//
-// Known, accepted limitation: a number given in another country's LOCAL
-// format (a bare leading 0, no country code — e.g. a UK number written as
-// "07911123456") is indistinguishable from a Pakistani local number and
-// gets assumed to be Pakistani, since that's this business's near-exclusive
-// market. A number that already includes a country code (via "+" or "00")
-// is always handled correctly regardless of country.
-function formatPhoneForTel(phone: string): string | null {
-  const digitsAndPlus = phone.replace(/[^\d+]/g, "");
-
-  let normalized: string;
-  if (digitsAndPlus.startsWith("+")) {
-    normalized = digitsAndPlus;
-  } else if (digitsAndPlus.startsWith("00")) {
-    // "00" is the common alternative to "+" for dialing internationally.
-    normalized = `+${digitsAndPlus.slice(2)}`;
-  } else if (digitsAndPlus.startsWith("0")) {
-    normalized = `+92${digitsAndPlus.slice(1)}`;
-  } else {
-    normalized = `+${digitsAndPlus}`;
-  }
-
-  const digitCount = normalized.replace(/\D/g, "").length;
-  if (digitCount < 8 || digitCount > 15) return null;
-  return normalized;
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-}
-
-function ContactButtons({ registration }: { registration: Registration }) {
-  const tel = formatPhoneForTel(registration.phone);
-  const email = isValidEmail(registration.email) ? registration.email : null;
-
-  return (
-    <div className="flex items-center gap-2">
-      {tel && (
-        <a
-          href={`tel:${tel}`}
-          aria-label={`Call ${registration.name}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
-        >
-          <Phone className="h-4 w-4" />
-        </a>
-      )}
-      {email && (
-        <a
-          href={`mailto:${email}`}
-          aria-label={`Email ${registration.name}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
-        >
-          <Mail className="h-4 w-4" />
-        </a>
-      )}
-    </div>
-  );
-}
 
 function ArchiveButton({
   registration,
@@ -177,7 +108,7 @@ function MobileRegistrationRow({
                 <span className="text-navy">{formatDate(registration.created_at)}</span>
               </p>
               <div className="flex items-center gap-2 pt-1">
-                <ContactButtons registration={registration} />
+                <ContactButtons name={registration.name} phone={registration.phone} email={registration.email} />
                 <ArchiveButton
                   registration={registration}
                   isArchived={isArchived}
@@ -202,7 +133,15 @@ export default function AdminRegistrationsPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
-  const [view, setView] = useState<View>("active");
+  // Lets the admin nav's "Active"/"Archived" dropdown links deep-link
+  // straight into the matching view (?view=archived) instead of always
+  // landing on Active. Reads window directly rather than useSearchParams()
+  // to avoid that hook's Suspense-boundary requirement for a value this
+  // page only needs once, at mount.
+  const [view, setView] = useState<View>(() => {
+    if (typeof window === "undefined") return "active";
+    return new URLSearchParams(window.location.search).get("view") === "archived" ? "archived" : "active";
+  });
   const [loadedView, setLoadedView] = useState<View>(view);
 
   // Reset the stale list the instant `view` changes, during render rather
@@ -420,7 +359,7 @@ export default function AdminRegistrationsPage() {
                     <td className="px-3 py-3 text-navy/60">{formatDate(r.created_at)}</td>
                     <td className="py-3 pl-3">
                       <div className="flex items-center gap-2">
-                        <ContactButtons registration={r} />
+                        <ContactButtons name={r.name} phone={r.phone} email={r.email} />
                         <ArchiveButton
                           registration={r}
                           isArchived={view === "archived"}

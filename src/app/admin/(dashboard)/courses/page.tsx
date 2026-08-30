@@ -23,6 +23,8 @@ const inputClasses =
 
 const LEVELS: Level[] = ["O Level", "A Level"];
 
+type LevelFilter = "all" | Level;
+
 function sortCourses(courses: Course[]): Course[] {
   return [...courses].sort((a, b) => a.level.localeCompare(b.level) || a.name.localeCompare(b.name));
 }
@@ -34,6 +36,16 @@ export default function AdminCoursesPage() {
   const [error, setError] = useState("");
   const [modalCourse, setModalCourse] = useState<Course | "new" | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Lets the admin nav's "O Levels"/"A Levels" dropdown links deep-link
+  // straight into a filtered view (?level=O%20Level) instead of always
+  // showing both. Reads window directly rather than useSearchParams() to
+  // avoid that hook's Suspense-boundary requirement for a value this page
+  // only needs once, at mount.
+  const [levelFilter, setLevelFilter] = useState<LevelFilter>(() => {
+    if (typeof window === "undefined") return "all";
+    const level = new URLSearchParams(window.location.search).get("level");
+    return level === "O Level" || level === "A Level" ? level : "all";
+  });
 
   function handleUnauthorized() {
     logout();
@@ -84,7 +96,7 @@ export default function AdminCoursesPage() {
     setModalCourse(null);
   }
 
-  const groups = LEVELS.map((level) => ({
+  const groups = LEVELS.filter((level) => levelFilter === "all" || levelFilter === level).map((level) => ({
     level,
     items: (courses ?? []).filter((c) => c.level === level),
   }));
@@ -104,6 +116,21 @@ export default function AdminCoursesPage() {
           <Plus className="h-4 w-4" />
           Add Course
         </button>
+      </div>
+
+      <div className="mt-4 inline-flex rounded-xl border border-navy/15 bg-white p-1">
+        {(["all", "O Level", "A Level"] as const).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => setLevelFilter(option)}
+            className={`rounded-lg px-4 py-1.5 text-sm font-bold transition-colors ${
+              levelFilter === option ? "bg-navy text-white" : "text-navy/50 hover:text-navy"
+            }`}
+          >
+            {option === "all" ? "All" : option}
+          </button>
+        ))}
       </div>
 
       {error && <p className="mt-4 text-red-600">{error}</p>}

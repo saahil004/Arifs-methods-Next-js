@@ -20,6 +20,17 @@ export type Subscriber = {
   email: string;
 };
 
+export type ContactQuery = {
+  id: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string | null;
+  subject: string;
+  message: string;
+};
+
 export type Course = {
   id: string;
   created_at: string;
@@ -129,6 +140,11 @@ export async function unarchiveRegistration(token: string, id: string) {
 export async function fetchSubscribers(token: string) {
   const data = await adminFetch<{ subscribers: Subscriber[] }>("/api/newsletter", token);
   return data.subscribers;
+}
+
+export async function fetchQueries(token: string) {
+  const data = await adminFetch<{ queries: ContactQuery[] }>("/api/queries", token);
+  return data.queries;
 }
 
 export async function deleteSubscriber(token: string, id: string) {
