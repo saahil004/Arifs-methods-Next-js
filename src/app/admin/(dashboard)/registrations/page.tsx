@@ -2,9 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Phone, Mail, ChevronDown } from "lucide-react";
+import { Search, Phone, Mail, ChevronDown, Archive, ArchiveRestore } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
-import { fetchRegistrations, UnauthorizedError, type Registration, type Level } from "@/lib/admin-api";
+import {
+  fetchRegistrations,
+  archiveRegistration,
+  unarchiveRegistration,
+  UnauthorizedError,
+  type Registration,
+  type Level,
+} from "@/lib/admin-api";
 
 type LevelFilter = "all" | Level;
 const UNSPECIFIED_GROUP = "No subject selected";
@@ -80,7 +87,53 @@ function ContactButtons({ registration }: { registration: Registration }) {
   );
 }
 
-function MobileRegistrationRow({ registration }: { registration: Registration }) {
+function ArchiveButton({
+  registration,
+  isArchived,
+  onArchive,
+  onUnarchive,
+}: {
+  registration: Registration;
+  isArchived: boolean;
+  onArchive: (r: Registration) => void;
+  onUnarchive: (r: Registration) => void;
+}) {
+  if (isArchived) {
+    return (
+      <button
+        type="button"
+        onClick={() => onUnarchive(registration)}
+        aria-label={`Restore ${registration.name}`}
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
+      >
+        <ArchiveRestore className="h-4 w-4" />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onArchive(registration)}
+      aria-label={`Archive ${registration.name}`}
+      className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy transition-colors hover:bg-navy hover:text-white"
+    >
+      <Archive className="h-4 w-4" />
+    </button>
+  );
+}
+
+function MobileRegistrationRow({
+  registration,
+  isArchived,
+  onArchive,
+  onUnarchive,
+}: {
+  registration: Registration;
+  isArchived: boolean;
+  onArchive: (r: Registration) => void;
+  onUnarchive: (r: Registration) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -113,14 +166,22 @@ function MobileRegistrationRow({ registration }: { registration: Registration })
             <span className="text-navy/50">Registered: </span>
             <span className="text-navy">{formatDate(registration.created_at)}</span>
           </p>
-          <div className="pt-1">
+          <div className="flex items-center gap-2 pt-1">
             <ContactButtons registration={registration} />
+            <ArchiveButton
+              registration={registration}
+              isArchived={isArchived}
+              onArchive={onArchive}
+              onUnarchive={onUnarchive}
+            />
           </div>
         </div>
       )}
     </div>
   );
 }
+
+type View = "active" | "archived";
 
 export default function AdminRegistrationsPage() {
   const router = useRouter();
@@ -129,20 +190,35 @@ export default function AdminRegistrationsPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
+  const [view, setView] = useState<View>("active");
+  const [loadedView, setLoadedView] = useState<View>(view);
+
+  // Reset the stale list the instant `view` changes, during render rather
+  // than in the effect below — this is React's supported pattern for
+  // "adjust state when a prop changes" and avoids the cascading-render
+  // warning that a synchronous setState inside an effect body triggers.
+  if (view !== loadedView) {
+    setLoadedView(view);
+    setRegistrations(null);
+  }
+
+  function handleUnauthorized() {
+    logout();
+    router.replace("/admin/login");
+  }
 
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
 
-    fetchRegistrations(token)
+    fetchRegistrations(token, { archived: view === "archived" })
       .then((data) => {
         if (!cancelled) setRegistrations(data);
       })
       .catch((err) => {
         if (cancelled) return;
         if (err instanceof UnauthorizedError) {
-          logout();
-          router.replace("/admin/login");
+          handleUnauthorized();
           return;
         }
         setError(err instanceof Error ? err.message : "Failed to load registrations");
@@ -152,7 +228,39 @@ export default function AdminRegistrationsPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, view]);
+
+  async function handleArchive(registration: Registration) {
+    if (!token) return;
+    if (!window.confirm(`Archive ${registration.name}'s registration? It will be permanently deleted after 14 days.`))
+      return;
+
+    try {
+      await archiveRegistration(token, registration.id);
+      setRegistrations((prev) => prev?.filter((r) => r.id !== registration.id) ?? prev);
+    } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        handleUnauthorized();
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Failed to archive registration");
+    }
+  }
+
+  async function handleUnarchive(registration: Registration) {
+    if (!token) return;
+
+    try {
+      await unarchiveRegistration(token, registration.id);
+      setRegistrations((prev) => prev?.filter((r) => r.id !== registration.id) ?? prev);
+    } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        handleUnauthorized();
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Failed to restore registration");
+    }
+  }
 
   const filtered = useMemo(() => {
     if (!registrations) return [];
@@ -194,6 +302,31 @@ export default function AdminRegistrationsPage() {
         {registrations ? `${registrations.length} total` : "Loading..."}
         {registrations && filtered.length !== registrations.length ? ` — ${filtered.length} matching filters` : ""}
       </p>
+
+      <div className="mt-4 inline-flex rounded-xl border border-navy/15 bg-white p-1">
+        <button
+          type="button"
+          onClick={() => setView("active")}
+          className={`rounded-lg px-4 py-1.5 text-sm font-bold transition-colors ${
+            view === "active" ? "bg-navy text-white" : "text-navy/50 hover:text-navy"
+          }`}
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          onClick={() => setView("archived")}
+          className={`rounded-lg px-4 py-1.5 text-sm font-bold transition-colors ${
+            view === "archived" ? "bg-navy text-white" : "text-navy/50 hover:text-navy"
+          }`}
+        >
+          Archived
+        </button>
+      </div>
+
+      {view === "archived" && (
+        <p className="mt-3 text-sm text-navy/50">Archived registrations are permanently deleted after 14 days.</p>
+      )}
 
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
@@ -247,7 +380,7 @@ export default function AdminRegistrationsPage() {
                   <th className="pb-3 font-bold">Level</th>
                   <th className="pb-3 font-bold">Registered</th>
                   <th className="pb-3 font-bold">
-                    <span className="sr-only">Contact</span>
+                    <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
@@ -260,7 +393,15 @@ export default function AdminRegistrationsPage() {
                     <td className="py-3 text-navy/70">{r.level}</td>
                     <td className="py-3 text-navy/60">{formatDate(r.created_at)}</td>
                     <td className="py-3">
-                      <ContactButtons registration={r} />
+                      <div className="flex items-center gap-2">
+                        <ContactButtons registration={r} />
+                        <ArchiveButton
+                          registration={r}
+                          isArchived={view === "archived"}
+                          onArchive={handleArchive}
+                          onUnarchive={handleUnarchive}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -270,7 +411,13 @@ export default function AdminRegistrationsPage() {
 
           <div className="sm:hidden">
             {group.map((r) => (
-              <MobileRegistrationRow key={r.id} registration={r} />
+              <MobileRegistrationRow
+                key={r.id}
+                registration={r}
+                isArchived={view === "archived"}
+                onArchive={handleArchive}
+                onUnarchive={handleUnarchive}
+              />
             ))}
           </div>
         </div>

@@ -11,6 +11,7 @@ export type Registration = {
   level: Level;
   subjects: string[];
   message: string | null;
+  archived_at: string | null;
 };
 
 export type Subscriber = {
@@ -94,9 +95,18 @@ export async function loginAdmin(email: string, password: string) {
   return { token: data.token as string, expiresAt: data.expiresAt as number };
 }
 
-export async function fetchRegistrations(token: string) {
-  const data = await adminFetch<{ registrations: Registration[] }>("/api/registrations", token);
+export async function fetchRegistrations(token: string, options?: { archived?: boolean }) {
+  const query = options?.archived ? "?archived=true" : "";
+  const data = await adminFetch<{ registrations: Registration[] }>(`/api/registrations${query}`, token);
   return data.registrations;
+}
+
+export async function archiveRegistration(token: string, id: string) {
+  await adminFetch(`/api/registrations/${id}/archive`, token, { method: "PATCH" });
+}
+
+export async function unarchiveRegistration(token: string, id: string) {
+  await adminFetch(`/api/registrations/${id}/unarchive`, token, { method: "PATCH" });
 }
 
 export async function fetchSubscribers(token: string) {
