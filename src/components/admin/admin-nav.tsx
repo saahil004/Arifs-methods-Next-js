@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
@@ -44,6 +44,7 @@ const links: NavLink[] = [
 
 export default function AdminNav() {
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAdminAuth();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -62,9 +63,9 @@ export default function AdminNav() {
           <span className="text-lg font-bold tracking-tight text-white">Arif&apos;s Methods</span>
         </Link>
 
-        <nav className="hidden lg:flex lg:gap-9">
+        <nav className="hidden lg:flex lg:items-center lg:gap-9">
           {links.map((link) => (
-            <DesktopNavItem key={link.href} link={link} />
+            <DesktopNavItem key={link.href} link={link} isActive={pathname === link.href} />
           ))}
         </nav>
 
@@ -92,7 +93,11 @@ export default function AdminNav() {
             <ul className="space-y-6">
               {links.map((link, idx) => (
                 <motion.li key={link.href} custom={idx} initial="hidden" animate="visible" variants={fadeUpStagger}>
-                  <DrawerNavItem link={link} onNavigate={() => setIsOpen(false)} />
+                  <DrawerNavItem
+                    link={link}
+                    isActive={pathname === link.href}
+                    onNavigate={() => setIsOpen(false)}
+                  />
                 </motion.li>
               ))}
               <motion.li
@@ -117,28 +122,34 @@ export default function AdminNav() {
   );
 }
 
-// Hover-revealed dropdown — a mouse-driven pattern, which is a safe
-// assumption here since touch/tablet widths get the drawer's tap-to-expand
-// accordion instead (this nav only renders at all from lg/1024px up).
-function DesktopNavItem({ link }: { link: NavLink }) {
+// Hover-only dropdown — deliberately not focus-triggered too. Combining both
+// made it feel sticky (clicking a sub-link leaves focus inside the panel,
+// which then refuses to close until focus moves elsewhere) — hover alone is
+// the simpler, more predictable behavior for a mouse-driven desktop nav
+// (touch/tablet widths get the drawer's tap-to-expand accordion instead;
+// this bar only renders at all from lg/1024px up).
+function DesktopNavItem({ link, isActive }: { link: NavLink; isActive: boolean }) {
+  const linkClasses = `text-[17px] font-bold transition-colors rounded-sm focus-visible:outline-2 focus-visible:outline-amber focus-visible:outline-offset-4 ${
+    isActive ? "text-amber" : "text-white hover:text-amber"
+  }`;
+
   if (!link.subLinks) {
     return (
-      <Link href={link.href} className="text-[17px] font-bold text-white transition-colors hover:text-amber">
-        {link.label}
-      </Link>
+      <div className="relative py-2">
+        <Link href={link.href} className={linkClasses}>
+          {link.label}
+        </Link>
+      </div>
     );
   }
 
   return (
     <div className="group relative py-2">
-      <Link
-        href={link.href}
-        className="flex items-center gap-1 text-[17px] font-bold text-white transition-colors hover:text-amber"
-      >
+      <Link href={link.href} className={`flex items-center gap-1 ${linkClasses}`}>
         {link.label}
         <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
       </Link>
-      <div className="invisible absolute left-0 top-full z-50 min-w-44 rounded-xl border border-navy/10 bg-white p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+      <div className="invisible absolute left-0 top-full z-50 min-w-44 rounded-xl border border-navy/10 bg-white p-2 opacity-0 shadow-xl transition-all duration-150 group-hover:visible group-hover:opacity-100">
         {link.subLinks.map((sub) => (
           <Link
             key={sub.href}
@@ -156,12 +167,21 @@ function DesktopNavItem({ link }: { link: NavLink }) {
 // Tap-to-expand accordion — the mobile-drawer counterpart to the desktop
 // hover dropdown. The parent label still navigates directly; the chevron is
 // a separate control just for revealing the sub-links.
-function DrawerNavItem({ link, onNavigate }: { link: NavLink; onNavigate: () => void }) {
+function DrawerNavItem({
+  link,
+  isActive,
+  onNavigate,
+}: {
+  link: NavLink;
+  isActive: boolean;
+  onNavigate: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const linkClasses = `text-lg font-bold ${isActive ? "text-amber" : ""}`;
 
   if (!link.subLinks) {
     return (
-      <AnimatedLink href={link.href} className="text-lg font-bold" onClick={onNavigate}>
+      <AnimatedLink href={link.href} className={linkClasses} onClick={onNavigate}>
         {link.label}
       </AnimatedLink>
     );
@@ -170,7 +190,7 @@ function DrawerNavItem({ link, onNavigate }: { link: NavLink; onNavigate: () => 
   return (
     <div>
       <div className="flex items-center justify-between gap-3">
-        <AnimatedLink href={link.href} className="text-lg font-bold" onClick={onNavigate}>
+        <AnimatedLink href={link.href} className={linkClasses} onClick={onNavigate}>
           {link.label}
         </AnimatedLink>
         <button
