@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { loginAdmin, refreshAdminSession, type AdminSession } from "@/lib/admin-api";
+import { loginAdmin, refreshAdminSession, logoutAdmin, type AdminSession } from "@/lib/admin-api";
 
 const STORAGE_KEY = "arifs-methods-admin-session";
 
@@ -28,7 +28,7 @@ function readSession(): AdminSession | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const session = JSON.parse(raw) as Partial<AdminSession>;
-    if (!session.token || !session.expiresAt || !session.refreshToken) return null;
+    if (!session.token || !session.expiresAt) return null;
     // expiresAt is a Supabase session expiry: Unix seconds, not milliseconds.
     if (session.expiresAt * 1000 <= Date.now()) return null;
     return session as AdminSession;
@@ -50,6 +50,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     localStorage.removeItem(STORAGE_KEY);
     setToken(null);
+    // Fire-and-forget: the frontend can't clear the httpOnly refresh-token
+    // cookie itself, so this just asks the backend to. Nothing here depends
+    // on it finishing before logout() returns.
+    logoutAdmin();
   }, []);
 
   // scheduleRefresh and doRefresh are mutually recursive (schedule fires
@@ -58,19 +62,21 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   // Routing the call through a ref — reassigned fresh on every render, so it
   // always sees the current logout/scheduleRefresh — breaks that cycle
   // without needing either function to depend on the other.
-  const doRefreshRef = useRef<(refreshToken: string) => void>(() => {});
+  const doRefreshRef = useRef<() => void>(() => {});
 
   const scheduleRefresh = useCallback((session: AdminSession) => {
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     const delayMs = Math.max((session.expiresAt - REFRESH_BUFFER_SECONDS) * 1000 - Date.now(), 0);
-    refreshTimerRef.current = setTimeout(() => doRefreshRef.current(session.refreshToken), delayMs);
+    refreshTimerRef.current = setTimeout(() => doRefreshRef.current(), delayMs);
   }, []);
 
   // Keeps the ref pointed at a closure over the latest logout/scheduleRefresh
   // after every render — a ref write belongs in an effect, not render itself.
   useEffect(() => {
-    doRefreshRef.current = (refreshToken: string) => {
-      refreshAdminSession(refreshToken).then((refreshed) => {
+    doRefreshRef.current = () => {
+      // No token passed — the browser attaches the httpOnly refresh-token
+      // cookie to this request on its own.
+      refreshAdminSession().then((refreshed) => {
         if (!refreshed) {
           logout();
           return;
@@ -97,7 +103,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       const current = readSession();
       if (!current) return;
       if (current.expiresAt * 1000 - Date.now() < REFRESH_BUFFER_SECONDS * 1000) {
-        doRefreshRef.current(current.refreshToken);
+        doRefreshRef.current();
       }
     }
     document.addEventListener("visibilitychange", handleVisibilityChange);

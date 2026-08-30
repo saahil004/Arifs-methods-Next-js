@@ -93,11 +93,16 @@ async function adminFetch<T>(path: string, token: string, init?: RequestInit): P
   return data as T;
 }
 
-export type AdminSession = { token: string; expiresAt: number; refreshToken: string };
+// No refreshToken field — it never reaches client-side JS. The backend
+// keeps it in an httpOnly cookie (see Backend/src/routes/admin.ts), which
+// the browser sends automatically on login/refresh/logout calls below via
+// credentials: "include"; nothing else needs to know it exists.
+export type AdminSession = { token: string; expiresAt: number };
 
 export async function loginAdmin(email: string, password: string): Promise<AdminSession> {
   const res = await fetch(`${API_URL}/api/admin/login`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
@@ -105,22 +110,28 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
   if (!res.ok || !data.success) {
     throw new Error(data.error || "Invalid email or password");
   }
-  return { token: data.token, expiresAt: data.expiresAt, refreshToken: data.refreshToken };
+  return { token: data.token, expiresAt: data.expiresAt };
 }
 
 // Called proactively, shortly before the current token expires — see
 // admin-auth.tsx's refresh timer. Returns null rather than throwing so a
-// failed refresh (e.g. the refresh token was itself revoked) reads as "time
-// to log out" rather than an error to surface.
-export async function refreshAdminSession(refreshToken: string): Promise<AdminSession | null> {
+// failed refresh (e.g. the refresh token was itself revoked or the cookie
+// is gone) reads as "time to log out" rather than an error to surface. No
+// argument needed — the browser attaches the refresh-token cookie itself.
+export async function refreshAdminSession(): Promise<AdminSession | null> {
   const res = await fetch(`${API_URL}/api/admin/refresh`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok || !data.success) return null;
-  return { token: data.token, expiresAt: data.expiresAt, refreshToken: data.refreshToken };
+  return { token: data.token, expiresAt: data.expiresAt };
+}
+
+// Clears the httpOnly refresh-token cookie server-side — the frontend has
+// no way to remove it itself, since httpOnly means no JS can touch it.
+export async function logoutAdmin(): Promise<void> {
+  await fetch(`${API_URL}/api/admin/logout`, { method: "POST", credentials: "include" }).catch(() => {});
 }
 
 export async function fetchRegistrations(token: string, options?: { archived?: boolean }) {
