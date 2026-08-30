@@ -82,7 +82,9 @@ async function adminFetch<T>(path: string, token: string, init?: RequestInit): P
   return data as T;
 }
 
-export async function loginAdmin(email: string, password: string) {
+export type AdminSession = { token: string; expiresAt: number; refreshToken: string };
+
+export async function loginAdmin(email: string, password: string): Promise<AdminSession> {
   const res = await fetch(`${API_URL}/api/admin/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -92,7 +94,22 @@ export async function loginAdmin(email: string, password: string) {
   if (!res.ok || !data.success) {
     throw new Error(data.error || "Invalid email or password");
   }
-  return { token: data.token as string, expiresAt: data.expiresAt as number };
+  return { token: data.token, expiresAt: data.expiresAt, refreshToken: data.refreshToken };
+}
+
+// Called proactively, shortly before the current token expires — see
+// admin-auth.tsx's refresh timer. Returns null rather than throwing so a
+// failed refresh (e.g. the refresh token was itself revoked) reads as "time
+// to log out" rather than an error to surface.
+export async function refreshAdminSession(refreshToken: string): Promise<AdminSession | null> {
+  const res = await fetch(`${API_URL}/api/admin/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) return null;
+  return { token: data.token, expiresAt: data.expiresAt, refreshToken: data.refreshToken };
 }
 
 export async function fetchRegistrations(token: string, options?: { archived?: boolean }) {

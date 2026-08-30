@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 
@@ -65,6 +66,12 @@ export default function LoginForm() {
         >
           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
+      </div>
+
+      <div className="text-right">
+        <Link href="/admin/forgot-password" className="text-sm font-bold text-navy/60 hover:text-navy">
+          Forgot password?
+        </Link>
       </div>
 
       {status === "error" && <p className="text-sm text-red-600">{errorMessage}</p>}
