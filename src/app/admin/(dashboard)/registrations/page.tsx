@@ -392,18 +392,20 @@ export default function AdminRegistrationsPage() {
             </span>
           </div>
 
-          {/* Desktop: full table. Below sm, five columns plus contact
-              buttons doesn't fit — a collapsible card list takes over instead. */}
-          <div className="hidden overflow-x-auto sm:block">
+          {/* Desktop: full table, matching the admin nav's own lg breakpoint
+              for when a screen is genuinely "desktop-sized." Below that, six
+              columns plus contact/archive buttons has no room to breathe —
+              a collapsible card list takes over instead. */}
+          <div className="hidden overflow-x-auto lg:block">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-navy/10 text-sm text-navy/50">
-                  <th className="pb-3 font-bold">Name</th>
-                  <th className="pb-3 font-bold">Phone</th>
-                  <th className="pb-3 font-bold">Email</th>
-                  <th className="pb-3 font-bold">Level</th>
-                  <th className="pb-3 font-bold">Registered</th>
-                  <th className="pb-3 font-bold">
+                  <th className="py-3 pr-3 font-bold">Name</th>
+                  <th className="px-3 py-3 font-bold">Phone</th>
+                  <th className="px-3 py-3 font-bold">Email</th>
+                  <th className="px-3 py-3 font-bold">Level</th>
+                  <th className="px-3 py-3 font-bold">Registered</th>
+                  <th className="py-3 pl-3 font-bold">
                     <span className="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -411,12 +413,12 @@ export default function AdminRegistrationsPage() {
               <tbody>
                 {group.map((r) => (
                   <tr key={r.id} className="border-b border-navy/5 last:border-0">
-                    <td className="py-3 text-navy">{r.name}</td>
-                    <td className="py-3 text-navy/70">{r.phone}</td>
-                    <td className="py-3 text-navy/70">{r.email || "—"}</td>
-                    <td className="py-3 text-navy/70">{r.level}</td>
-                    <td className="py-3 text-navy/60">{formatDate(r.created_at)}</td>
-                    <td className="py-3">
+                    <td className="py-3 pr-3 text-navy">{r.name}</td>
+                    <td className="px-3 py-3 text-navy/70">{r.phone}</td>
+                    <td className="px-3 py-3 text-navy/70">{r.email || "—"}</td>
+                    <td className="px-3 py-3 text-navy/70">{r.level}</td>
+                    <td className="px-3 py-3 text-navy/60">{formatDate(r.created_at)}</td>
+                    <td className="py-3 pl-3">
                       <div className="flex items-center gap-2">
                         <ContactButtons registration={r} />
                         <ArchiveButton
@@ -433,7 +435,7 @@ export default function AdminRegistrationsPage() {
             </table>
           </div>
 
-          <div className="sm:hidden">
+          <div className="lg:hidden">
             {group.map((r) => (
               <MobileRegistrationRow
                 key={r.id}
