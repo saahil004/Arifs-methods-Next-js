@@ -87,3 +87,46 @@ body {
   opacity: 0;
   animation: splash-text-in 400ms ease-out 300ms forwards;
 }
+
+/* Admin panel's equivalent of the splash overlay above — same zero-JS,
+   server-rendered-first-paint reasoning, but its own class name since both
+   root layouts (marketing and admin) import this same stylesheet. The
+   "ADMINS" text reveals letter-by-letter via a fixed animation-delay per
+   span (set inline in the markup), rather than fading in as one block. */
+@keyframes admin-splash-letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  pointer-events: none;
+  /* Longer than the marketing splash's 800ms — the last letter of "ADMINS"
+     finishes animating in at ~1000ms (650ms delay + 350ms duration below),
+     so this needs enough runway to hold the completed word on screen for a
+     moment before fading, rather than cutting it off mid-reveal. */
+  animation: splash-fade-out 1700ms ease-out forwards;
+}
+
+.admin-splash-overlay img {
+  animation: splash-logo-pop 500ms ease-out both;
+}
+
+.admin-splash-overlay .admin-splash-text span {
+  display: inline-block;
+  opacity: 0;
+  animation: admin-splash-letter-in 350ms ease-out forwards;
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Anton } from "next/font/google";
 import "@/app/globals.css";
 import { AdminAuthProvider } from "@/lib/admin-auth";
+import AdminRouteTransition from "@/components/admin/admin-route-transition";
 
 // This is its own root layout — deliberately independent from the public
 // site's app/(marketing)/layout.tsx (no shared Header/Footer/nav). The admin
@@ -39,6 +40,18 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
     >
       <body className="min-h-full">
         <AdminAuthProvider>{children}</AdminAuthProvider>
+        <AdminRouteTransition />
+        <div className="admin-splash-overlay" aria-hidden="true">
+          <img src="/logo-icon.svg" alt="" className="h-48 w-48" />
+          <div className="admin-splash-text font-display mt-4 flex text-5xl uppercase tracking-wide text-navy">
+            <span style={{ animationDelay: "300ms" }}>A</span>
+            <span style={{ animationDelay: "370ms" }}>D</span>
+            <span style={{ animationDelay: "440ms" }}>M</span>
+            <span style={{ animationDelay: "510ms" }}>I</span>
+            <span style={{ animationDelay: "580ms" }}>N</span>
+            <span style={{ animationDelay: "650ms" }}>S</span>
+          </div>
+        </div>
       </body>
     </html>
   );
