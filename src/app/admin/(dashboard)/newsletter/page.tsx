@@ -186,10 +186,16 @@ function SendEmailCard({
   const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
+  // Remounting the file input via a changing key (rather than clearing its
+  // .value by hand) is what lets the same file be re-selected a second time.
+  // Setting .value = "" directly on a React-managed file input desyncs
+  // React's own internal change-tracking for that element, which silently
+  // breaks the *next* selection — confirmed by reproducing it directly.
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFiles((prev) => [...prev, ...Array.from(e.target.files ?? [])]);
-    e.target.value = "";
+    setFileInputKey((k) => k + 1);
   }
 
   function removeFile(index: number) {
@@ -249,7 +255,7 @@ function SendEmailCard({
           <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-bold text-navy hover:text-amber">
             <Paperclip className="h-4 w-4" />
             Attach files
-            <input type="file" multiple onChange={handleFileChange} className="hidden" />
+            <input key={fileInputKey} type="file" multiple onChange={handleFileChange} className="hidden" />
           </label>
 
           {files.length > 0 && (
