@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, ImageIcon } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import {
   fetchTeachers,
@@ -11,6 +11,7 @@ import {
   createTeacher,
   updateTeacher,
   deleteTeacher,
+  uploadTeacherPhoto,
   UnauthorizedError,
   type Teacher,
   type TeacherInput,
@@ -230,9 +231,36 @@ function TeacherForm({
   const [courseIds, setCourseIds] = useState<string[]>(teacher?.courses.map((c) => c.id) ?? []);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  // Remounting the file input via a changing key is what lets the same file
+  // be re-selected a second time — see the newsletter broadcast form for the
+  // full explanation of why setting .value directly would break that.
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   function toggleCourse(id: string) {
     setCourseIds((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  }
+
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    setFileInputKey((k) => k + 1);
+    if (!file || !token) return;
+
+    setUploading(true);
+    setUploadError("");
+    try {
+      const url = await uploadTeacherPhoto(token, file);
+      setPhotoUrl(url);
+    } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        onUnauthorized();
+        return;
+      }
+      setUploadError(err instanceof Error ? err.message : "Failed to upload photo");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -290,13 +318,40 @@ function TeacherForm({
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-bold text-navy">Photo URL</label>
+        <label className="mb-1.5 block text-sm font-bold text-navy">Photo</label>
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-navy/10">
+            {photoUrl ? (
+              // A plain <img>, not next/image — see the rationale on
+              // TeacherCard's photo above.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <ImageIcon className="h-6 w-6 text-navy/30" />
+            )}
+          </div>
+          <div className="flex-1 space-y-1.5">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-navy/10 px-4 py-2 text-sm font-bold text-navy transition-colors hover:bg-navy hover:text-white">
+              <Upload className="h-4 w-4" />
+              {uploading ? "Uploading..." : "Upload Photo"}
+              <input
+                key={fileInputKey}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handlePhotoSelect}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+            {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
+          </div>
+        </div>
         <input
           type="url"
           value={photoUrl}
           onChange={(e) => setPhotoUrl(e.target.value)}
-          placeholder="https://... (optional)"
-          className={inputClasses}
+          placeholder="or paste an image URL"
+          className={`${inputClasses} mt-3`}
         />
       </div>
 

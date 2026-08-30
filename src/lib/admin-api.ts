@@ -187,6 +187,16 @@ export async function deleteTeacher(token: string, id: string) {
   await adminFetch(`/api/teachers/${id}`, token, { method: "DELETE" });
 }
 
+export async function uploadTeacherPhoto(token: string, file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const data = await adminFetch<{ url: string }>("/api/teachers/upload-photo", token, {
+    method: "POST",
+    body: formData,
+  });
+  return data.url;
+}
+
 export type AnalyticsOverview = {
   activeUsers: number;
   newUsers: number;
