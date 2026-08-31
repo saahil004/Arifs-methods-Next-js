@@ -25,6 +25,7 @@ export default function ContactForm() {
       firstName: formData.get("firstName"),
       lastName: formData.get("lastName"),
       email: formData.get("email"),
+      phone: formData.get("phone"),
       subject: formData.get("subject"),
       message: formData.get("message"),
       website: formData.get("website"),
@@ -103,17 +104,27 @@ export default function ContactForm() {
           className={inputClasses}
           data-clarity-mask="true"
         />
-        <select name="subject" required defaultValue="" className={inputClasses}>
-          <option value="" disabled>
-            Subject
-          </option>
-          {SUBJECTS.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone Number (optional)"
+          pattern="\+?[0-9\s-]{7,20}"
+          title="Please enter a valid phone number"
+          className={inputClasses}
+          data-clarity-mask="true"
+        />
       </div>
+
+      <select name="subject" required defaultValue="" className={inputClasses}>
+        <option value="" disabled>
+          Subject
+        </option>
+        {SUBJECTS.map((subject) => (
+          <option key={subject} value={subject}>
+            {subject}
+          </option>
+        ))}
+      </select>
 
       <textarea
         name="message"
@@ -134,7 +145,6 @@ export default function ContactForm() {
         >
           {status === "submitting" ? "Sending..." : "Send Message"}
         </button>
-        <p className="mt-4 text-sm text-navy/40">* All fields are required.</p>
       </div>
     </form>
   );

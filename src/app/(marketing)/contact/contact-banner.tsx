@@ -25,7 +25,7 @@ export default function ContactBanner({
       // happens over far less horizontal distance, turning an elegant slope
       // into a sharp wedge. Shallower on small screens, fuller on desktop
       // where the extra width carries it well.
-      className="relative flex min-h-110 items-center justify-center overflow-hidden bg-navy pt-20 [clip-path:polygon(0_0,100%_0,100%_100%,0_94%)] sm:[clip-path:polygon(0_0,100%_0,100%_100%,0_88%)] lg:[clip-path:polygon(0_0,100%_0,100%_100%,0_85%)]"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy pt-20 [clip-path:polygon(0_0,100%_0,100%_100%,0_94%)] sm:[clip-path:polygon(0_0,100%_0,100%_100%,0_88%)] lg:[clip-path:polygon(0_0,100%_0,100%_100%,0_85%)]"
     >
       {/* TODO: swap for a real banner photo — reusing hero.jpg as a
           placeholder for now, per request. A plain CSS background (not

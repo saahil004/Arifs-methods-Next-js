@@ -35,7 +35,7 @@ export default function ContactCard() {
     // (auto) z-index. Without this, the banner painted on top of this card
     // in the overlapping region, despite coming first in the markup.
     <section className="relative z-10 mx-auto max-w-5xl px-6 pb-20">
-      <div className="-mt-20 grid overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
+      <div className="-mt-40 grid overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
         <div className="relative min-h-80 lg:min-h-full">
           <iframe
             src={`https://www.google.com/maps?q=${MAP_QUERY}&output=embed`}
