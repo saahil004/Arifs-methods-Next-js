@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ContactBanner from "./contact-banner";
+import ContactCard from "./contact-card";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -10,8 +11,7 @@ export default function ContactPage() {
   return (
     <main>
       <ContactBanner title="Get in Touch" breadcrumb={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
-      {/* Contact card (map + address/phone/email, matching the reference
-          design) comes next. */}
+      <ContactCard />
     </main>
   );
 }
