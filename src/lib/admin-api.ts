@@ -162,6 +162,10 @@ export async function deleteSubscriber(token: string, id: string) {
   await adminFetch(`/api/newsletter/${id}`, token, { method: "DELETE" });
 }
 
+export async function deleteQuery(token: string, id: string) {
+  await adminFetch(`/api/queries/${id}`, token, { method: "DELETE" });
+}
+
 export async function sendNewsletterBroadcast(token: string, subject: string, message: string, files: File[]) {
   const formData = new FormData();
   formData.append("subject", subject);

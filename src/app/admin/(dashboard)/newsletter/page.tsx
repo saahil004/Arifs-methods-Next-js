@@ -10,6 +10,7 @@ import {
   deleteSubscriber,
   sendNewsletterBroadcast,
   fetchQueries,
+  deleteQuery,
   UnauthorizedError,
   type Subscriber,
   type ContactQuery,
@@ -367,6 +368,7 @@ function QueriesSection({ token, onUnauthorized }: { token: string | null; onUna
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<ContactQuery | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const isDesktop = useIsDesktop();
 
   useEffect(() => {
@@ -405,6 +407,26 @@ function QueriesSection({ token, onUnauthorized }: { token: string | null; onUna
   }, [queries, search]);
 
   const selectedTitle = selected ? `${selected.first_name} ${selected.last_name}` : "";
+
+  async function handleDelete(query: ContactQuery) {
+    if (!token) return;
+    if (!window.confirm(`Delete this query from ${query.first_name} ${query.last_name}? This can't be undone.`)) return;
+
+    setDeletingId(query.id);
+    try {
+      await deleteQuery(token, query.id);
+      setQueries((prev) => prev?.filter((q) => q.id !== query.id) ?? prev);
+      setSelected(null);
+    } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        onUnauthorized();
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Failed to delete query");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <motion.div
@@ -460,18 +482,30 @@ function QueriesSection({ token, onUnauthorized }: { token: string | null; onUna
           message and tapping a call/email button. */}
       {isDesktop ? (
         <AdminModal isOpen={selected !== null} onClose={() => setSelected(null)} title={selectedTitle}>
-          {selected && <QueryDetails query={selected} />}
+          {selected && (
+            <QueryDetails query={selected} onDelete={handleDelete} isDeleting={deletingId === selected.id} />
+          )}
         </AdminModal>
       ) : (
         <AdminDrawer isOpen={selected !== null} onClose={() => setSelected(null)} title={selectedTitle}>
-          {selected && <QueryDetails query={selected} />}
+          {selected && (
+            <QueryDetails query={selected} onDelete={handleDelete} isDeleting={deletingId === selected.id} />
+          )}
         </AdminDrawer>
       )}
     </motion.div>
   );
 }
 
-function QueryDetails({ query }: { query: ContactQuery }) {
+function QueryDetails({
+  query,
+  onDelete,
+  isDeleting,
+}: {
+  query: ContactQuery;
+  onDelete: (query: ContactQuery) => void;
+  isDeleting: boolean;
+}) {
   return (
     <div className="space-y-4">
       <div>
@@ -499,6 +533,18 @@ function QueryDetails({ query }: { query: ContactQuery }) {
 
       <div className="border-t border-navy/5 pt-4">
         <ContactButtons name={`${query.first_name} ${query.last_name}`} phone={query.phone} email={query.email} />
+      </div>
+
+      <div className="border-t border-navy/5 pt-4">
+        <button
+          type="button"
+          onClick={() => onDelete(query)}
+          disabled={isDeleting}
+          className="flex items-center gap-2 text-sm font-bold text-red-600 transition-colors hover:text-red-700 disabled:opacity-40"
+        >
+          <Trash2 className="h-4 w-4" />
+          {isDeleting ? "Deleting..." : "Delete Query"}
+        </button>
       </div>
     </div>
   );
