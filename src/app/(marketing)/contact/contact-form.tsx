@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trackEvent, trackMetaEvent } from "@/lib/analytics";
 
 const inputClasses =
@@ -11,8 +11,19 @@ const SUBJECTS = ["Admissions", "Course Information", "Fees & Payments", "Genera
 type Status = "idle" | "submitting" | "success" | "error";
 
 export default function ContactForm() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    // Swapping the full form out for the short success message shrinks the
+    // page a lot, so without this the scroll offset ends up pointing at
+    // whatever content (often the footer) now sits at that same pixel
+    // position instead of the confirmation — same fix as register-form.tsx.
+    if (status === "success") {
+      containerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [status]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,7 +68,7 @@ export default function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="mt-10 rounded-xl bg-amber/10 p-6 text-center">
+      <div ref={containerRef} className="mt-10 rounded-xl bg-amber/10 p-6 text-center">
         <p className="font-bold text-navy">Message sent!</p>
         <p className="mt-2 text-navy/60">Thanks for reaching out — we&apos;ll get back to you shortly.</p>
       </div>
@@ -65,7 +76,11 @@ export default function ContactForm() {
   }
 
   return (
-    <form className="mt-10 space-y-4 text-left" onSubmit={handleSubmit}>
+    <form
+      ref={containerRef as unknown as React.RefObject<HTMLFormElement | null>}
+      className="mt-10 space-y-4 text-left"
+      onSubmit={handleSubmit}
+    >
       {/* Honeypot — real visitors never see or fill this in. */}
       <input
         type="text"
