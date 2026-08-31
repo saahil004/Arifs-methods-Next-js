@@ -29,7 +29,12 @@ function InfoRow({
 
 export default function ContactCard() {
   return (
-    <section className="mx-auto max-w-5xl px-6 pb-20">
+    // relative (not static, the default) is required here — the banner
+    // above is position: relative, and CSS paints positioned elements above
+    // non-positioned siblings regardless of DOM order, even at the same
+    // (auto) z-index. Without this, the banner painted on top of this card
+    // in the overlapping region, despite coming first in the markup.
+    <section className="relative z-10 mx-auto max-w-5xl px-6 pb-20">
       <div className="-mt-20 grid overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
         <div className="relative min-h-80 lg:min-h-full">
           <iframe
