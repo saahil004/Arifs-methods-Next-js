@@ -29,9 +29,15 @@ export default function ContactBanner({
     >
       {/* A plain CSS background (not next/image) is required here
           specifically so bg-fixed works — an <img> has no "background" to
-          attach. */}
+          attach. bg-fixed is desktop-only (lg:): this section is also
+          clip-path'd and overflow-hidden, and that combination is exactly
+          what makes background-attachment: fixed misbehave on mobile —
+          iOS Safari in particular can detach or clip the background
+          incorrectly, and even where it "works" it forces a repaint on
+          every scroll frame, which janks on phones. Below lg it just
+          scrolls normally with the page. */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-fixed"
+        className="absolute inset-0 bg-cover bg-center lg:bg-fixed"
         style={{ backgroundImage: "url('/contact-banner.png')" }}
       />
       {/* Much lighter than a typical photo overlay — the artwork is already
