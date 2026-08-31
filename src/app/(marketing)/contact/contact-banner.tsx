@@ -27,15 +27,17 @@ export default function ContactBanner({
       // where the extra width carries it well.
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy pt-20 [clip-path:polygon(0_0,100%_0,100%_100%,0_94%)] sm:[clip-path:polygon(0_0,100%_0,100%_100%,0_88%)] lg:[clip-path:polygon(0_0,100%_0,100%_100%,0_85%)]"
     >
-      {/* TODO: swap for a real banner photo — reusing hero.jpg as a
-          placeholder for now, per request. A plain CSS background (not
-          next/image) is required here specifically so bg-fixed works — an
-          <img> has no "background" to attach. */}
+      {/* A plain CSS background (not next/image) is required here
+          specifically so bg-fixed works — an <img> has no "background" to
+          attach. */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed"
-        style={{ backgroundImage: "url('/hero.jpg')" }}
+        style={{ backgroundImage: "url('/contact-banner.png')" }}
       />
-      <div className="absolute inset-0 bg-navy/75" />
+      {/* Much lighter than a typical photo overlay — the artwork is already
+          a dark navy illustration, so a heavy tint would bury it rather
+          than just steady the white text on top. */}
+      <div className="absolute inset-0 bg-navy/40" />
 
       {/* Decorative wave shapes, layered over the photo+overlay. */}
       <svg
