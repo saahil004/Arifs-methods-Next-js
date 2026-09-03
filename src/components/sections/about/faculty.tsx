@@ -32,8 +32,14 @@ export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[]
         {/* flex-wrap + fixed card widths, not a grid: a grid with fewer
             teachers than columns leaves the last row lopsided against the
             left edge — this centers whatever number of cards there are
-            instead of assuming the roster is always a multiple of 4. */}
-        <div className="flex flex-wrap justify-center gap-6">
+            instead of assuming the roster is always a multiple of 4.
+            relative z-10 is required here — the two decorative circles
+            above are position: absolute, and CSS paints positioned
+            elements above non-positioned siblings regardless of DOM order,
+            even at the same (auto) z-index. Without this the circles
+            painted on top of the cards despite coming first in the markup
+            (the same bug fixed earlier on the Contact page's card). */}
+        <div className="relative z-10 flex flex-wrap justify-center gap-6">
           {teachers.map((teacher) => (
             <TeacherCard key={teacher.id} teacher={teacher} />
           ))}
