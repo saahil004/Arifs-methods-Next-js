@@ -14,7 +14,12 @@ export default function AtAGlance({ subjectCount }: { subjectCount: number }) {
 
   return (
     <section className="relative bg-white">
-      <div className="relative bg-navy/5 pt-16 pb-16 [clip-path:polygon(0_0,100%_0,100%_88%,0_100%)] sm:pt-20 sm:pb-20">
+      {/* cream, not navy/5: Faculty (between this and FounderQuote) hides
+          itself entirely when there are no teachers yet — which is the
+          site's actual state right now — so this and FounderQuote can end
+          up touching directly. Matching tints there would merge them into
+          one undifferentiated gray block with no visible seam. */}
+      <div className="relative bg-cream pt-16 pb-16 [clip-path:polygon(0_0,100%_0,100%_88%,0_100%)] sm:pt-20 sm:pb-20">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-12 px-6 text-center sm:grid-cols-4">
           {facts.map(({ icon: Icon, value, label }) => (
             <div key={label}>

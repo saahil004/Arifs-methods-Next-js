@@ -8,7 +8,10 @@ const QUOTE =
 
 export default function FounderQuote() {
   return (
-    <section className="relative overflow-hidden bg-amber/10">
+    // navy/5, not amber/10: this sits directly under OurMethod's bg-cream,
+    // and two warm pale-yellow tones back to back had almost no contrast
+    // between them. A cool tint reads as a clean, deliberate break instead.
+    <section className="relative overflow-hidden bg-navy/5">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-16 bg-cream [clip-path:polygon(0_0,100%_0,100%_100%,0_12px)]"
@@ -16,9 +19,11 @@ export default function FounderQuote() {
 
       <div className="relative z-10 mx-auto grid max-w-5xl items-center gap-16 px-6 py-16 sm:py-20 md:grid-cols-2">
         <div className="relative mx-auto w-full max-w-sm lg:mx-0">
+          {/* amber/15, not navy/5: that circle would now be the same color
+              as the section behind it and vanish. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-8 h-56 w-56 -translate-y-1/2 rounded-full bg-navy/5"
+            className="pointer-events-none absolute top-1/2 left-8 h-56 w-56 -translate-y-1/2 rounded-full bg-amber/15"
           />
           <div className="relative aspect-4/5 w-full overflow-hidden rounded-3xl shadow-xl">
             <Image
