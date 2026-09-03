@@ -47,7 +47,7 @@ export default function ContactCta() {
             }}
           />
           <div className="absolute inset-0 -z-10 translate-x-6 translate-y-6 rounded-3xl bg-amber/10" />
-          <div className="relative aspect-4/5 overflow-hidden rounded-3xl">
+          <div className="relative aspect-4/3 overflow-hidden rounded-3xl lg:aspect-4/5">
             <Image
               src="/sir-arif.jpg"
               alt="Sir Arif, founder and Mathematics educator at Arif's Methods"

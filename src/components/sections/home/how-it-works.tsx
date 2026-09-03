@@ -61,7 +61,10 @@ export default function HowItWorks() {
               6-unit page gutter and puts a horizontal scrollbar on the whole
               document. At lg+ the image is only half the row, so there's room. */}
           <div className="absolute inset-0 -z-10 translate-x-4 translate-y-4 rounded-3xl bg-amber/10 lg:translate-x-8 lg:translate-y-8" />
-          <div className="relative aspect-4/5 overflow-hidden rounded-3xl">
+          {/* Portrait only at lg, where the image is half the row and sits
+              beside the text. Below that it spans the full content width, so
+              4/5 would make it ~965px tall on a tablet and eat the viewport. */}
+          <div className="relative aspect-4/3 overflow-hidden rounded-3xl lg:aspect-4/5">
             <Image
               src="/how-it-works.jpg"
               alt="Study desk with O & A Level books, past papers and a goals notebook"
