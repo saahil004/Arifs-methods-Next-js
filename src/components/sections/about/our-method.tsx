@@ -81,7 +81,7 @@ export default function OurMethod() {
                 i === 1 ? "lg:ml-10" : i === 2 ? "lg:ml-4" : ""
               }`}
             >
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber/15">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-navy/10">
                 <Icon className="h-6 w-6 text-navy" />
               </div>
               <div>

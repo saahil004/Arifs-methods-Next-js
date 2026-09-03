@@ -1,4 +1,3 @@
-import { Users } from "lucide-react";
 import type { Teacher } from "@/lib/admin-api";
 
 // The layout below is built for a 4-up row (see the flex-basis calc on each
@@ -13,7 +12,8 @@ export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[]
   return (
     <section className="relative overflow-hidden bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-6 text-center">
-        <Users className="mx-auto h-10 w-10 text-amber" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icons/teams.svg" alt="" className="mx-auto h-14 w-auto" />
         <h2 className="mt-6 px-10 text-3xl font-extrabold leading-tight text-navy sm:text-4xl">
           Meet the teachers behind the results.
         </h2>

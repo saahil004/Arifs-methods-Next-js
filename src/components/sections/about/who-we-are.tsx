@@ -83,11 +83,11 @@ export default function WhoWeAre() {
               }}
             />
             <div className="relative h-64 w-full overflow-hidden rounded-2xl shadow-lg sm:absolute sm:top-0 sm:right-0 sm:h-56 sm:w-72">
-              <Image src="/why-choose-us.jpg" alt="" fill sizes="(min-width: 640px) 288px, 90vw" className="object-cover" />
+              <Image src="/who1.jpg" alt="" fill sizes="(min-width: 640px) 288px, 90vw" className="object-cover" />
             </div>
             <div className="relative h-64 w-full overflow-hidden rounded-2xl shadow-xl sm:absolute sm:bottom-0 sm:left-0 sm:h-72 sm:w-80">
               <Image
-                src="/how-it-works.jpg"
+                src="/who2.jpg"
                 alt=""
                 fill
                 sizes="(min-width: 640px) 320px, 90vw"

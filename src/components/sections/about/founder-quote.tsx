@@ -23,15 +23,21 @@ export default function FounderQuote() {
               as the section behind it and vanish. */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-8 h-56 w-56 -translate-y-1/2 rounded-full bg-amber/15"
+            className="pointer-events-none absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber/15"
           />
-          <div className="relative aspect-4/5 w-full overflow-hidden rounded-3xl shadow-xl">
+          {/* This is a background-removed cutout, not a rectangular photo —
+              no card/overflow-hidden/rounded-corners treatment (there's no
+              rectangle to round) and drop-shadow (which follows the actual
+              silhouette alpha) instead of shadow-xl (a box-shadow, which
+              would draw a shadow for the invisible bounding rectangle
+              rather than the person). */}
+          <div className="relative mx-auto aspect-350/416 w-72 drop-shadow-xl">
             <Image
-              src="/sir-arif.jpg"
+              src="/sir-arif-cutout.png"
               alt="Sir Arif, founder and Mathematics educator at Arif's Methods"
               fill
-              sizes="(min-width: 768px) 400px, 90vw"
-              className="object-cover"
+              sizes="(min-width: 768px) 288px, 70vw"
+              className="object-contain"
             />
           </div>
         </div>
