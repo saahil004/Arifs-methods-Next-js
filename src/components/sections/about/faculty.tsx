@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import type { Teacher } from "@/lib/admin-api";
+import BottomSheet from "@/components/ui/bottom-sheet";
 
 // The layout below is built for a 4-up row (see the flex-basis calc on each
 // card) — capping here rather than in the page keeps that assumption next to
@@ -7,6 +11,7 @@ const MAX_TEACHERS = 4;
 
 export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[] }) {
   const teachers = allTeachers.slice(0, MAX_TEACHERS);
+  const [selected, setSelected] = useState<Teacher | null>(null);
   if (teachers.length === 0) return null;
 
   return (
@@ -41,33 +46,86 @@ export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[]
             (the same bug fixed earlier on the Contact page's card). */}
         <div className="relative z-10 flex flex-wrap justify-center gap-6">
           {teachers.map((teacher) => (
-            <TeacherCard key={teacher.id} teacher={teacher} />
+            <TeacherCard key={teacher.id} teacher={teacher} onReadMore={() => setSelected(teacher)} />
           ))}
         </div>
       </div>
+
+      <BottomSheet isOpen={selected !== null} onClose={() => setSelected(null)} title={selected?.name}>
+        {selected && <TeacherDetails teacher={selected} />}
+      </BottomSheet>
     </section>
   );
 }
 
-function TeacherCard({ teacher }: { teacher: Teacher }) {
+function TeacherCard({ teacher, onReadMore }: { teacher: Teacher; onReadMore: () => void }) {
   const subjects = teacher.courses.map((c) => c.name).join(", ");
 
   return (
-    <div className="w-full max-w-72 rounded-2xl bg-white p-8 shadow-[0_4px_30px_rgba(0,0,0,0.06)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
-      <div className="flex h-22 w-22 items-center justify-center overflow-hidden rounded-full bg-navy/10">
-        {teacher.photoUrl ? (
-          // A plain <img>, not next/image: photoUrl is an arbitrary URL an
-          // admin pastes in, and next/image requires every remote host to
-          // be allow-listed in next.config.ts up front — impractical here.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={teacher.photoUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <span className="text-2xl font-bold text-navy/40">{teacher.name.charAt(0).toUpperCase()}</span>
-        )}
-      </div>
+    // No max-w cap on the base size: below sm there's one card per row, and
+    // a fixed 288px cap left visible empty space on either side inside the
+    // section's padding instead of the card actually filling the row.
+    // flex flex-col + mt-auto on the button below keeps Read More aligned
+    // to the same bottom edge across cards regardless of how long a given
+    // teacher's name/subjects/bio preview runs.
+    <div className="flex w-full flex-col rounded-2xl bg-white p-8 shadow-[0_4px_30px_rgba(0,0,0,0.06)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
+      <TeacherAvatar teacher={teacher} className="h-22 w-22 text-2xl" />
       <h3 className="mt-8 text-xl font-bold text-navy">{teacher.name}</h3>
       {subjects && <p className="mt-2 text-sm font-bold tracking-wide text-navy/40 uppercase">{subjects}</p>}
-      {teacher.bio && <p className="mt-4 leading-relaxed text-navy/60">{teacher.bio}</p>}
+      {/* line-clamp-3, not the full bio — the untruncated version now lives
+          in the sheet, so the card stays a predictable height regardless of
+          how much an admin wrote for a given teacher. */}
+      {teacher.bio && <p className="mt-4 line-clamp-3 leading-relaxed text-navy/60">{teacher.bio}</p>}
+      <button
+        type="button"
+        onClick={onReadMore}
+        className="mt-auto self-start pt-4 text-sm font-bold text-navy underline-offset-2 hover:text-amber hover:underline"
+      >
+        Read More
+      </button>
+    </div>
+  );
+}
+
+function TeacherDetails({ teacher }: { teacher: Teacher }) {
+  // No name label here — the sheet's own title bar already shows it, and
+  // repeating it right below made the avatar row feel padded out rather
+  // than purposeful.
+  return (
+    <div>
+      <TeacherAvatar teacher={teacher} className="h-16 w-16 text-lg" />
+
+      {teacher.courses.length > 0 && (
+        <div className="mt-6 flex flex-wrap gap-1.5">
+          {teacher.courses.map((c) => (
+            <span key={c.id} className="rounded-full bg-navy/10 px-2.5 py-1 text-xs font-bold text-navy">
+              {c.name}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {teacher.bio ? (
+        <p className="mt-6 leading-relaxed text-navy/70">{teacher.bio}</p>
+      ) : (
+        <p className="mt-6 text-navy/40">No bio added yet.</p>
+      )}
+    </div>
+  );
+}
+
+function TeacherAvatar({ teacher, className = "" }: { teacher: Teacher; className?: string }) {
+  return (
+    <div className={`flex items-center justify-center overflow-hidden rounded-full bg-navy/10 ${className}`}>
+      {teacher.photoUrl ? (
+        // A plain <img>, not next/image: photoUrl is an arbitrary URL an
+        // admin pastes in, and next/image requires every remote host to be
+        // allow-listed in next.config.ts up front — impractical here.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={teacher.photoUrl} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <span className="font-bold text-navy/40">{teacher.name.charAt(0).toUpperCase()}</span>
+      )}
     </div>
   );
 }
