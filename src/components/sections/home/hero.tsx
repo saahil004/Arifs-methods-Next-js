@@ -19,6 +19,7 @@ const item: Variants = {
 export default function Hero({
   eyebrow,
   title,
+  titleItalic,
   subtitle,
   image,
   ctaLabel = "Register Now",
@@ -26,6 +27,8 @@ export default function Hero({
 }: {
   eyebrow?: string;
   title: string;
+  /** Optional second headline line, set in italic beneath the first. */
+  titleItalic?: string;
   subtitle: string;
   image?: string;
   ctaLabel?: string;
@@ -53,7 +56,7 @@ export default function Hero({
       <div className="absolute inset-0 bg-black/50" />
 
       <motion.div
-        className="relative z-10 mx-auto max-w-3xl px-6 text-center"
+        className="relative z-10 mx-auto max-w-5xl px-6 text-center"
         variants={container}
         initial="hidden"
         animate="visible"
@@ -65,11 +68,21 @@ export default function Hero({
         )}
         <motion.h1
           variants={item}
-          className="font-display text-4xl uppercase leading-[1.05] tracking-wide text-white sm:text-5xl lg:text-6xl"
+          className="font-[family-name:var(--font-editorial)] text-4xl font-normal uppercase leading-[1.05] tracking-[0.04em] text-white sm:text-5xl lg:text-6xl xl:text-7xl"
         >
           {title}
+          {titleItalic && (
+            <>
+              {/* A block span rather than <br>, so the italic line can carry
+                  its own slightly tighter tracking — italics read too airy
+                  at the roman line's spacing. */}
+              <span className="block italic tracking-[0.02em]">{titleItalic}</span>
+            </>
+          )}
         </motion.h1>
-        <motion.p variants={item} className="mt-6 text-lg leading-relaxed text-white/80">
+        {/* Kept narrower than the headline above it — the wide measure that
+            suits a display line is an uncomfortable read for body copy. */}
+        <motion.p variants={item} className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
           {subtitle}
         </motion.p>
         <motion.div variants={item} className="mt-8">

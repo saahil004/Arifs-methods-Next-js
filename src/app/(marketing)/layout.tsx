@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Anton } from "next/font/google";
+import { Geist, Geist_Mono, Anton, Bodoni_Moda } from "next/font/google";
 import "@/app/globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
@@ -23,6 +23,16 @@ const anton = Anton({
   variable: "--font-anton",
   subsets: ["latin"],
   weight: "400",
+});
+
+// Both styles are loaded because the hero headline sets its second line in
+// true italic — Bodoni's italic is a separate drawing, not a slant, and
+// faux-italicising it would lose exactly the detail that makes it work.
+const bodoni = Bodoni_Moda({
+  variable: "--font-bodoni",
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
 const title = "Arif's Methods | O & A Level Tuition Academy in Karachi";
@@ -73,7 +83,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} ${bodoni.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Analytics />

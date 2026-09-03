@@ -14,6 +14,10 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-anton), Impact, sans-serif;
+  /* Editorial high-contrast serif, used for the hero headline's magazine
+     look — Anton is a condensed sans with no italic, so it can't produce
+     that roman/italic two-line treatment at all. */
+  --font-editorial: var(--font-bodoni), Didot, Georgia, serif;
 }
 
 body {

@@ -10,7 +10,8 @@ export default function Home() {
     <main>
       <Hero
         eyebrow="O & A Level Academy"
-        title="Excel in O & A Levels with Arif's Methods"
+        title="Excel in O & A Levels"
+        titleItalic="with Arif's Methods"
         subtitle="Expert tutors and structured lessons across O & A Level subjects — with Mathematics and Additional Mathematics as our flagship specialty — built to help you achieve top grades."
         image="/hero.jpg"
       />
