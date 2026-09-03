@@ -7,11 +7,13 @@ export default function HeaderShell({ children }: { children: React.ReactNode })
 
   return (
     <header
-      className={`${
-        scrolled
-          ? "fixed top-0 left-0 right-0 z-40 bg-white shadow-md transition-all"
-          : "absolute top-0 left-0 right-0 z-40 transition-all"
-      } ${headerHidden ? "-translate-y-full" : "translate-y-0"}`}
+      // Hidden by moving `top`, never by translate: a translate (or any
+      // transform) on this element makes it the containing block for the
+      // position:fixed drawers rendered inside it, which collapses them
+      // from the full viewport down to the header's own 80px-tall box.
+      className={`${scrolled ? "fixed bg-white shadow-md" : "absolute"} right-0 left-0 z-40 transition-all ${
+        headerHidden ? "-top-20" : "top-0"
+      }`}
     >
       {children}
     </header>
