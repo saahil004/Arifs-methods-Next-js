@@ -4,7 +4,7 @@ import Image from "next/image";
 // tone of the section. Swap in a real quote from him (or have him approve
 // this one) before treating it as final.
 const QUOTE =
-  "I got into teaching because I remember what it felt like to be stuck on a concept that just needed to be explained differently. That's still what every lesson here is built around — meeting a student exactly where they are, not where the syllabus assumes they should be.";
+  "Ayaan is very sick. He needs meds.";
 
 export default function FounderQuote() {
   return (
