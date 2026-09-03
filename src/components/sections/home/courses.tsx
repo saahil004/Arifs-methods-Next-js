@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
 import { useMediaQuery } from "@/lib/use-media-query";
+import { useHeaderTheme } from "@/components/layout/header-theme";
 import { fadeUpStagger } from "@/lib/motion";
 
 // Deliberately static: these four are the academy's core O Level offering and
@@ -139,6 +140,22 @@ export default function Courses() {
 function CourseScrollCards() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+  const { setHeaderHidden } = useHeaderTheme();
+
+  // Progress is strictly between 0 and 1 exactly while the section is
+  // pinned, so that doubles as "a card currently fills the viewport" —
+  // which is when a white header bar floating over it looks like a mistake.
+  // Only writes state on the flip, not on every scroll frame.
+  const pinnedRef = useRef(false);
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    const pinned = progress > 0 && progress < 1;
+    if (pinned === pinnedRef.current) return;
+    pinnedRef.current = pinned;
+    setHeaderHidden(pinned);
+  });
+
+  // Leaving the page mid-section would otherwise strand the header offscreen.
+  useEffect(() => () => setHeaderHidden(false), [setHeaderHidden]);
 
   // The spring takes the edge off the last few pixels of scroll input. Lenis
   // already smooths the wheel itself, so this is deliberately stiff — enough

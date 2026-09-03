@@ -3,15 +3,15 @@
 import { useHeaderTheme } from "./header-theme";
 
 export default function HeaderShell({ children }: { children: React.ReactNode }) {
-  const { scrolled } = useHeaderTheme();
+  const { scrolled, headerHidden } = useHeaderTheme();
 
   return (
     <header
-      className={
+      className={`${
         scrolled
           ? "fixed top-0 left-0 right-0 z-40 bg-white shadow-md transition-all"
           : "absolute top-0 left-0 right-0 z-40 transition-all"
-      }
+      } ${headerHidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       {children}
     </header>
