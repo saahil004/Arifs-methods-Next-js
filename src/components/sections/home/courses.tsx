@@ -152,15 +152,11 @@ function CourseScrollCards() {
 
   return (
     <div ref={sectionRef} className="relative mt-14 hidden h-[400vh] lg:block">
-      {/* The pinned wrapper stays a full viewport tall so the scroll maths
-          is unchanged; the track inside is shorter and vertically centred,
-          so the cards leave some page visible above and below rather than
-          taking over the whole screen. */}
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        {/* shrink-0 is load-bearing: as a flex item the track would otherwise
-            be shrunk from 400% down to the container's width, collapsing all
-            four cards into a single screen. */}
-        <motion.div style={{ x }} className="flex h-[78vh] w-[400%] shrink-0">
+      {/* Cards fill the pinned viewport rather than sitting shorter inside
+          it — the subject artwork is square, and at a reduced card height it
+          no longer had the room to sit at a sensible size beside the copy. */}
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <motion.div style={{ x }} className="flex h-full w-[400%]">
           {COURSES.map((course, i) => (
             <CourseCard key={course.code} course={course} index={i} />
           ))}
