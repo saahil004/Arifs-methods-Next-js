@@ -40,12 +40,19 @@ export default function PortfolioBanner() {
       <div className="relative z-10 flex min-h-screen flex-col pt-20">
         {/* <Marquee reduceMotion={reduceMotion} /> */}
 
-        <div className="flex flex-1 items-center px-6">
+        {/* items-end, not items-center: in the reference the headline sits
+            directly on the rule below it rather than floating in the middle
+            of the banner. leading-[0.8] pulls the line box in tight to the
+            glyphs so the gap is optical, not the font's descender space. */}
+        <div className="flex flex-1 items-end px-6">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="font-[family-name:var(--font-editorial)] w-full text-center text-[13vw] leading-[0.95] font-normal text-white lg:text-left"
+            // nowrap only from lg: the headline is sized to span the width
+            // on one line there, but forcing that on a phone would push it
+            // wider than the viewport.
+            className="font-[family-name:var(--font-editorial)] w-full text-center text-[13vw] leading-[0.8] font-normal text-white lg:text-left lg:text-[11.4vw] lg:whitespace-nowrap"
           >
             Results in Focus
           </motion.h1>
