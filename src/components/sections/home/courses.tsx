@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { fadeUpStagger } from "@/lib/motion";
 
@@ -20,24 +20,32 @@ const COURSES = [
     name: "Mathematics",
     level: "O Level",
     image: "/courses/4024-mathematics.png",
+    description:
+      "Number, algebra, geometry, trigonometry, mensuration and statistics — the foundation every other subject leans on. We work through it topic by topic until the method is second nature, not memorised.",
   },
   {
     code: "4037",
     name: "Additional Mathematics",
     level: "O Level",
     image: "/courses/4037-additional-mathematics.png",
+    description:
+      "The step up from 4024: calculus, advanced algebra, trigonometric identities and vectors. Our flagship subject, and the one students most often arrive worried about and leave confident in.",
   },
   {
     code: "5054",
     name: "Physics",
     level: "O Level",
     image: "/courses/5054-physics.png",
+    description:
+      "Mechanics, waves, electricity, magnetism and atomic physics. The marks here go to students who can apply a formula to an unfamiliar situation, so that's exactly what we drill.",
   },
   {
     code: "5070",
     name: "Chemistry",
     level: "O Level",
     image: "/courses/5070-chemistry.png",
+    description:
+      "Atomic structure, bonding, stoichiometry and organic chemistry, alongside the practical paper. Plenty of past-paper work, because chemistry rewards knowing how questions are actually asked.",
   },
 ];
 
@@ -97,10 +105,7 @@ export default function Courses() {
         </div>
       </div>
 
-      {/* Full-bleed on desktop: the band reads as one continuous strip edge
-          to edge, so it deliberately escapes the page container the heading
-          above it sits in. */}
-      <CourseAccordion />
+      <CourseScrollCards />
 
       <div className="mx-auto max-w-6xl px-6">
         <CourseCarousel />
@@ -127,58 +132,82 @@ export default function Courses() {
   );
 }
 
-// lg and up: panels sit flush in one band and the hovered subject widens while
-// the rest give up space. object-left keeps each artwork's title in frame even
-// at a collapsed panel's width, so every subject stays identifiable.
-function CourseAccordion() {
-  const [active, setActive] = useState<number | null>(null);
+// lg and up: the section is four viewports tall, with one viewport-sized
+// panel pinned inside it. Scrolling down that height drives the card track
+// sideways instead, so each subject swipes to the next as you scroll —
+// hence h-400vh for four cards (three card-widths of travel over 300vh).
+function CourseScrollCards() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+
+  // The spring takes the edge off the last few pixels of scroll input. Lenis
+  // already smooths the wheel itself, so this is deliberately stiff — enough
+  // to kill jitter, not enough to make the cards lag behind the scroll.
+  const smoothed = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
+
+  // Percentages of the track's own width, not vw: the track is 400% of the
+  // pinned panel, so -75% of it is exactly three cards. Using vw here would
+  // drift by the scrollbar's width.
+  const x = useTransform(smoothed, [0, 1], ["0%", "-75%"]);
 
   return (
-    <div className="mt-14 hidden h-130 overflow-hidden lg:flex">
-      {COURSES.map((course, i) => (
-        <Link
-          key={course.code}
-          href={COURSES_HREF}
-          onMouseEnter={() => setActive(i)}
-          onMouseLeave={() => setActive(null)}
-          onFocus={() => setActive(i)}
-          onBlur={() => setActive(null)}
-          // basis-0 + flexGrow means the panels share the band by ratio, so
-          // one expanding necessarily shrinks the others without any width maths.
-          style={{ flexGrow: active === i ? 2.6 : active === null ? 1 : 0.8 }}
-          className="group relative min-w-0 basis-0 outline-none transition-[flex-grow] duration-500 ease-out focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-amber"
-        >
+    <div ref={sectionRef} className="relative mt-14 hidden h-[400vh] lg:block">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <motion.div style={{ x }} className="flex h-full w-[400%]">
+          {COURSES.map((course, i) => (
+            <CourseCard key={course.code} course={course} index={i} />
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function CourseCard({ course, index }: { course: (typeof COURSES)[number]; index: number }) {
+  // Alternating navy/amber rather than one colour per subject: the site only
+  // has two brand colours, and alternating gives each swipe a visible change
+  // of state without inventing a third or fourth hue.
+  const isNavy = index % 2 === 0;
+
+  return (
+    <div
+      className={`flex h-full w-1/4 shrink-0 items-center ${isNavy ? "bg-navy text-white" : "bg-amber text-navy"}`}
+    >
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
+        <div>
+          <p className={`font-display text-8xl leading-none ${isNavy ? "text-white/25" : "text-navy/25"}`}>
+            {String(index + 1).padStart(2, "0")}
+          </p>
+          <p
+            className={`mt-8 text-sm font-bold uppercase tracking-widest ${isNavy ? "text-amber" : "text-navy/60"}`}
+          >
+            {course.level} &middot; Syllabus {course.code}
+          </p>
+          <h3 className="mt-3 text-4xl font-extrabold leading-tight xl:text-5xl">{course.name}</h3>
+          <p className={`mt-6 max-w-lg leading-relaxed ${isNavy ? "text-white/70" : "text-navy/70"}`}>
+            {course.description}
+          </p>
+          <Link
+            href={COURSES_HREF}
+            className={`mt-8 inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold transition-transform duration-200 hover:scale-105 active:scale-95 ${
+              isNavy ? "bg-amber text-navy hover:bg-amber/90" : "bg-navy text-white hover:bg-navy/90"
+            }`}
+          >
+            Explore the Course
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="relative aspect-square w-full overflow-hidden rounded-3xl shadow-2xl">
           <Image
             src={course.image}
             alt={`${course.level} ${course.name}`}
             fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            // Anchored to the top because the artwork is square and the panel
-            // is wider than tall once expanded: centring the crop would cut
-            // the logo and subject title off the top edge.
-            className="object-cover object-top"
+            sizes="(min-width: 1024px) 45vw, 90vw"
+            className="object-cover"
           />
-
-          {/* Every panel but the hovered one is covered. The artwork carries
-              its own subject title, which at a collapsed panel's width would
-              otherwise be sliced mid-word and clash with the caption below;
-              covering it means only the expanded panel shows artwork, and the
-              caption is the single label everywhere else. */}
-          <div
-            className={`absolute inset-0 bg-navy transition-opacity duration-500 ${
-              active === i ? "opacity-0" : "opacity-90"
-            }`}
-          />
-
-          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-navy via-navy/80 to-transparent p-6 pt-16">
-            <p className="truncate text-sm font-bold uppercase tracking-widest text-amber">{course.level}</p>
-            <div className="mt-1 flex items-center justify-between gap-3">
-              <h3 className="truncate text-lg font-bold text-white">{course.name}</h3>
-              <ArrowRight className="h-5 w-5 shrink-0 text-white transition-transform duration-300 group-hover:translate-x-1" />
-            </div>
-          </div>
-        </Link>
-      ))}
+        </div>
+      </div>
     </div>
   );
 }

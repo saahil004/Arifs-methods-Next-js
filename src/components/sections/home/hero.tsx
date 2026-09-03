@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { useHeaderTheme } from "@/components/layout/header-theme";
@@ -43,14 +42,16 @@ export default function Hero({
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy">
+      {/* A plain CSS background, not next/image — an <img> has no
+          "background" to attach, and that's what lg:bg-fixed needs.
+          Desktop-only for the same reason as the Contact/About banners:
+          background-attachment: fixed is unreliable on mobile (iOS Safari
+          especially) and forces a repaint every scroll frame even where it
+          "works," which janks on phones. */}
       {image && (
-        <Image
-          src={image}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
+        <div
+          className="absolute inset-0 bg-cover bg-center lg:bg-fixed"
+          style={{ backgroundImage: `url('${image}')` }}
         />
       )}
       <div className="absolute inset-0 bg-black/50" />
