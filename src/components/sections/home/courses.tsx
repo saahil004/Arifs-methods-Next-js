@@ -50,27 +50,26 @@ export default function Courses() {
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-6">
         <motion.p
-        custom={0}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.6 }}
-        variants={fadeUpStagger}
-        className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"
-      >
-        <span className="h-px w-6 bg-amber" />
-        Our Courses
-      </motion.p>
-      <motion.h2
-        custom={1}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.6 }}
-        variants={fadeUpStagger}
-        className="max-w-3xl text-4xl font-extrabold leading-tight text-navy sm:text-5xl"
-      >
-        Subjects we teach across O &amp; A Levels.
-      </motion.h2>
-
+          custom={0}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.6 }}
+          variants={fadeUpStagger}
+          className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"
+        >
+          <span className="h-px w-6 bg-amber" />
+          Our Courses
+        </motion.p>
+        <motion.h2
+          custom={1}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.6 }}
+          variants={fadeUpStagger}
+          className="max-w-3xl text-4xl font-extrabold leading-tight text-navy sm:text-5xl"
+        >
+          Subjects we teach across O &amp; A Levels.
+        </motion.h2>
       </div>
 
       {/* Full-bleed on desktop: the band reads as one continuous strip edge
@@ -103,7 +102,7 @@ function CourseAccordion() {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <div className="mt-12 hidden h-130 overflow-hidden lg:flex">
+    <div className="mt-14 hidden h-130 overflow-hidden lg:flex">
       {COURSES.map((course, i) => (
         <Link
           key={course.code}
@@ -122,14 +121,17 @@ function CourseAccordion() {
             alt={`${course.level} ${course.name}`}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover object-left"
+            // Anchored to the top because the artwork is square and the panel
+            // is wider than tall once expanded: centring the crop would cut
+            // the logo and subject title off the top edge.
+            className="object-cover object-top"
           />
 
           {/* Every panel but the hovered one is covered. The artwork carries
               its own subject title, which at a collapsed panel's width would
-              otherwise be sliced mid-word ("O LEVE / MATH") and clash with
-              the caption below; hiding it means only the expanded panel shows
-              artwork, and the caption is the single label everywhere else. */}
+              otherwise be sliced mid-word and clash with the caption below;
+              covering it means only the expanded panel shows artwork, and the
+              caption is the single label everywhere else. */}
           <div
             className={`absolute inset-0 bg-navy transition-opacity duration-500 ${
               active === i ? "opacity-0" : "opacity-90"
@@ -186,18 +188,20 @@ function CourseCarousel() {
       <div
         ref={trackRef}
         onScroll={handleScroll}
-        className="mt-12 flex snap-x snap-mandatory gap-6 overflow-x-auto scrollbar-none"
+        className="mt-14 flex snap-x snap-mandatory gap-6 overflow-x-auto scrollbar-none"
       >
         {COURSES.map((course) => (
           <article key={course.code} className="w-full shrink-0 snap-start md:w-[calc(50%-0.75rem)]">
             <Link href={COURSES_HREF} className="group block">
-              <div className="relative aspect-4/3 overflow-hidden rounded-3xl">
+              {/* Square container matching the artwork's own 1:1, so cover
+                  fills it exactly and nothing is cropped. */}
+              <div className="relative aspect-square overflow-hidden rounded-3xl">
                 <Image
                   src={course.image}
                   alt={`${course.level} ${course.name}`}
                   fill
                   sizes="(min-width: 768px) 50vw, 90vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="object-cover"
                 />
               </div>
               <h3 className="mt-5 text-lg font-bold text-navy group-hover:text-amber">{course.name}</h3>

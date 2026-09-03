@@ -67,7 +67,7 @@ export default function Features() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.6 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="max-w-3xl text-4xl font-extrabold leading-tight text-navy sm:text-5xl"
+        className="max-w-md text-3xl font-extrabold leading-tight text-navy sm:text-4xl"
       >
         Everything you need to excel in O &amp; A Levels.
       </motion.h2>

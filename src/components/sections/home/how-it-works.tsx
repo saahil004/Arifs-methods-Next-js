@@ -88,7 +88,7 @@ export default function HowItWorks() {
             <span className="h-px w-6 bg-amber" />
             How It Works
           </motion.p>
-          <motion.h2 variants={item} className="max-w-lg text-4xl font-extrabold leading-tight text-navy sm:text-5xl">
+          <motion.h2 variants={item} className="max-w-md text-3xl font-extrabold leading-tight text-navy sm:text-4xl">
             Three simple steps to getting started.
           </motion.h2>
 
