@@ -5,6 +5,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import ScrollToTop from "@/components/layout/scroll-to-top";
 import RouteTransition from "@/components/layout/route-transition";
+import SmoothScroll from "@/components/layout/smooth-scroll";
 import Analytics from "@/components/analytics";
 import { HeaderThemeProvider } from "@/components/layout/header-theme";
 import { siteConfig } from "@/lib/site-config";
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${anton.variable} ${bodoni.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <SmoothScroll />
         <Analytics />
         <script
           type="application/ld+json"
