@@ -110,10 +110,13 @@ export default function TermsContent() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
       <div className="grid gap-12 lg:grid-cols-[260px_1fr]">
-        {/* top-28 clears the fixed h-20 header plus breathing room; self-start
-            stops the grid's row-stretch from pulling this to the content's
-            full height, which would break sticky positioning. */}
-        <nav aria-label="Table of contents" className="lg:sticky lg:top-28 lg:self-start">
+        {/* Desktop-only: below lg there's no room for a rail beside the
+            content, and a 9-item list stacked above the text just pushes
+            the actual content down before a reader can start on it.
+            top-28 clears the fixed h-20 header plus breathing room;
+            self-start stops the grid's row-stretch from pulling this to the
+            content's full height, which would break sticky positioning. */}
+        <nav aria-label="Table of contents" className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
           <p className="mb-4 text-sm font-bold uppercase tracking-widest text-navy/40">On this page</p>
           <ul className="space-y-1 border-l border-navy/10">
             {SECTIONS.map((section) => (
