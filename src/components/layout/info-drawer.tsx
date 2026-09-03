@@ -33,10 +33,14 @@ export default function InfoDrawer() {
             <p>{siteConfig.contact.address.line2}</p>
           </div>
           <div className="mt-4 space-y-1 text-white/60">
-            <a href={`mailto:${siteConfig.contact.email}`} className="block hover:text-amber">
+            <a
+              href={`mailto:${siteConfig.contact.email}`}
+              onClick={() => setIsOpen(false)}
+              className="block hover:text-amber"
+            >
               {siteConfig.contact.email}
             </a>
-            <a href={siteConfig.contact.phoneHref} className="block hover:text-amber">
+            <a href={siteConfig.contact.phoneHref} onClick={() => setIsOpen(false)} className="block hover:text-amber">
               {siteConfig.contact.phone}
             </a>
           </div>
@@ -49,7 +53,7 @@ export default function InfoDrawer() {
             {
               learnMoreLinks.map((link) => (
                 <li key={link.label}>
-                  <AnimatedLink href={link.href}>
+                  <AnimatedLink href={link.href} onClick={() => setIsOpen(false)}>
                    {link.label}
                   </AnimatedLink>
                 </li>
@@ -58,7 +62,7 @@ export default function InfoDrawer() {
           </ul>
         </div>
 
-          <SocialLinks />
+          <SocialLinks onLinkClick={() => setIsOpen(false)} />
       </Drawer>
     </>
   );

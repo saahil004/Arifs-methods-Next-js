@@ -9,7 +9,7 @@ const socials = [
   { icon: FaYoutube, label: "Youtube", href: siteConfig.social.youtube },
 ];
 
-export default function SocialLinks({ className = "" }: { className?: string }) {
+export default function SocialLinks({ className = "", onLinkClick }: { className?: string; onLinkClick?: () => void }) {
   return (
     <div className={className}>
       <h3 className="mb-4 text-xl font-bold text-white">Follow Us</h3>
@@ -19,6 +19,7 @@ export default function SocialLinks({ className = "" }: { className?: string }) 
             key={label}
             href={href}
             aria-label={label}
+            onClick={onLinkClick}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1b1e27] transition hover:bg-amber"
           >
             <Icon className="h-4 w-4" />
