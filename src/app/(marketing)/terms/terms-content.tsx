@@ -48,11 +48,48 @@ const SECTIONS = [
     ],
   },
   {
-    id: "communication",
-    title: "6. Communication & Privacy",
+    id: "privacy",
+    title: "6. Privacy Policy",
     body: [
-      "We use the phone number and email address provided at registration to share updates about classes, fees, and — where a student or parent has opted in — our newsletter. You can ask to be removed from newsletter communications at any time.",
-      "Details of how we collect, use, and protect personal information are set out in our Privacy Policy, which forms part of these Terms.",
+      "This section explains what personal information we collect through our website and in the course of enrollment, and how we use it. It applies whenever you register, submit a contact enquiry, subscribe to our newsletter, or otherwise interact with this site.",
+    ],
+    subsections: [
+      {
+        heading: "Information We Collect",
+        body: [
+          "When you register for a course or submit a contact enquiry, we collect the information you provide directly — typically your name, phone number, email address, the subjects or level you're interested in, and any message you include. If you subscribe to our newsletter, we collect your email address for that purpose.",
+        ],
+      },
+      {
+        heading: "How We Use Your Information",
+        body: [
+          "We use this information to process enrollments, respond to enquiries, communicate about classes and fees, and — only where you've subscribed — send newsletter updates about new courses and results. We do not sell your personal information to third parties.",
+        ],
+      },
+      {
+        heading: "Cookies & Analytics",
+        body: [
+          "We use Google Analytics (GA4) and Meta Pixel to understand how visitors use our website — for example, which pages are viewed and which forms are submitted — so we can improve the site. These tools may set cookies in your browser. You can control or block cookies through your browser settings.",
+        ],
+      },
+      {
+        heading: "Third-Party Services",
+        body: [
+          "We rely on third-party services to run our website and communications: Supabase to store registration and enquiry records, and Brevo to send newsletter emails. These providers process data on our behalf and are not permitted to use it for their own purposes.",
+        ],
+      },
+      {
+        heading: "Data Retention",
+        body: [
+          "Registration records that are archived in our system are automatically and permanently deleted after 14 days. Active records, and newsletter subscriptions, are kept for as long as needed to provide our services, or until you ask us to remove them.",
+        ],
+      },
+      {
+        heading: "Your Rights",
+        body: [
+          "You can ask us at any time to see what information we hold about you, to correct it, or to have it deleted — including unsubscribing from the newsletter. Contact us using the details in Section 9 below to make a request.",
+        ],
+      },
     ],
   },
   {
@@ -154,6 +191,20 @@ export default function TermsContent() {
                   {section.body.map((paragraph, i) => (
                     <p key={i}>{paragraph}</p>
                   ))}
+                  {section.subsections && (
+                    <div className="space-y-6">
+                      {section.subsections.map((sub) => (
+                        <div key={sub.heading}>
+                          <h3 className="font-bold text-navy">{sub.heading}</h3>
+                          {sub.body.map((paragraph, i) => (
+                            <p key={i} className="mt-2">
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {section.id === "contact" && (
                     <ul className="space-y-1">
                       <li>

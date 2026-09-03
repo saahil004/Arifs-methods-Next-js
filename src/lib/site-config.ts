@@ -25,6 +25,9 @@ export const siteConfig = {
     { label: "Courses", href: "/courses" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Terms of Use", href: "/terms" },
-    { label: "Privacy Policy", href: "/privacy" },
+    // Privacy Policy is a section on the Terms page, not its own route —
+    // the hash takes the reader straight to it via terms-content.tsx's
+    // scroll-mt-28 + id="privacy".
+    { label: "Privacy Policy", href: "/terms#privacy" },
   ],
 } as const;
