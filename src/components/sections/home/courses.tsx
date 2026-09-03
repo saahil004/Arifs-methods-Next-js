@@ -49,27 +49,52 @@ export default function Courses() {
   return (
     <section className="py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.p
-          custom={0}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.6 }}
-          variants={fadeUpStagger}
-          className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"
-        >
-          <span className="h-px w-6 bg-amber" />
-          Our Courses
-        </motion.p>
-        <motion.h2
-          custom={1}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.6 }}
-          variants={fadeUpStagger}
-          className="max-w-3xl text-4xl font-extrabold leading-tight text-navy sm:text-5xl"
-        >
-          Subjects we teach across O &amp; A Levels.
-        </motion.h2>
+        {/* On lg the heading and a link to the full listing share a row —
+            below that, Enrol Now/View All Courses do the same job as a
+            centered button pair further down, so this link is redundant
+            there and hidden. */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <motion.p
+              custom={0}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.6 }}
+              variants={fadeUpStagger}
+              className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber"
+            >
+              <span className="h-px w-6 bg-amber" />
+              Our Courses
+            </motion.p>
+            <motion.h2
+              custom={1}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.6 }}
+              variants={fadeUpStagger}
+              className="max-w-3xl text-4xl font-extrabold leading-tight text-navy sm:text-5xl"
+            >
+              Subjects we teach across O &amp; A Levels.
+            </motion.h2>
+          </div>
+
+          <motion.div
+            custom={2}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.6 }}
+            variants={fadeUpStagger}
+            className="hidden lg:block"
+          >
+            <Link
+              href={COURSES_HREF}
+              className="inline-flex items-center gap-2 font-bold text-navy transition-colors hover:text-amber"
+            >
+              View All Courses
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </motion.div>
+        </div>
       </div>
 
       {/* Full-bleed on desktop: the band reads as one continuous strip edge
@@ -80,14 +105,21 @@ export default function Courses() {
       <div className="mx-auto max-w-6xl px-6">
         <CourseCarousel />
 
-        {/* Desktop panels are themselves the call to action, so this button
+        {/* Desktop panels are themselves the call to action, and the "View
+            All Courses" link sits in the heading row instead — so this pair
             is only for the breakpoints that show the carousel. */}
-        <div className="mt-10 text-center lg:hidden">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4 lg:hidden">
           <Link
             href="/register"
             className="inline-block rounded-full bg-amber px-8 py-4 font-bold text-navy transition-transform duration-200 hover:scale-105 hover:bg-amber/90 active:scale-95"
           >
             Enrol Now
+          </Link>
+          <Link
+            href={COURSES_HREF}
+            className="inline-block rounded-full border-2 border-navy/15 px-8 py-4 font-bold text-navy transition-colors duration-200 hover:border-navy/40"
+          >
+            View All Courses
           </Link>
         </div>
       </div>
