@@ -3,6 +3,7 @@ import Features from "@/components/sections/home/features";
 import HowItWorks from "@/components/sections/home/how-it-works";
 import WhyChooseUs from "@/components/sections/home/why-choose-us";
 import QuoteBanner from "@/components/sections/home/quote-banner";
+import Courses from "@/components/sections/home/courses";
 import ContactCta from "@/components/sections/home/contact-cta";
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
       <HowItWorks />
       <WhyChooseUs />
       <QuoteBanner />
+      <Courses />
       <ContactCta />
     </main>
   );
