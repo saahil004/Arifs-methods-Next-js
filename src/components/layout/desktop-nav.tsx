@@ -8,6 +8,17 @@ import { navLinks } from "@/lib/nav";
 import { useHeaderTheme } from "./header-theme";
 import { useCourseNavGroups } from "@/lib/use-course-nav-groups";
 
+// Grows an underline in from the left on hover. Deliberately applied only
+// to the top-level links below — the mega-menu's group buttons and item
+// links keep their plain colour-change hover, so the underline stays a
+// signal for "this is a section of the site" rather than decorating
+// everything in the dropdown too. bg-current means it inherits whatever
+// the link's colour is (white over a dark banner, navy otherwise, amber
+// on hover) without needing a variant per state.
+const UNDERLINE =
+  "relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-current " +
+  "after:transition-all after:duration-300 hover:after:w-full";
+
 export default function DesktopNav() {
   const [openItem, setOpenItem] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
@@ -37,7 +48,7 @@ export default function DesktopNav() {
           >
             {hasMega ? (
               <Link
-                className={`flex items-center gap-1 text-[17px] font-bold transition-colors ${isOpen ? "text-amber" : white ? "text-white hover:text-amber" : "text-navy hover:text-amber"
+                className={`${UNDERLINE} flex items-center gap-1 text-[17px] font-bold transition-colors ${isOpen ? "text-amber" : white ? "text-white hover:text-amber" : "text-navy hover:text-amber"
                   }`}
                 aria-expanded={isOpen}
                 href={link.href}
@@ -51,7 +62,7 @@ export default function DesktopNav() {
             ) : (
               <Link
                 href={link.href}
-                className={`flex items-center gap-1 text-[17px] font-bold transition-colors hover:text-amber ${white ? "text-white" : "text-navy"}`}
+                className={`${UNDERLINE} flex items-center gap-1 text-[17px] font-bold transition-colors hover:text-amber ${white ? "text-white" : "text-navy"}`}
               >
                 {link.label}
               </Link>

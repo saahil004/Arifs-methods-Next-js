@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PortfolioBanner from "./portfolio-banner";
+import Testimonials from "./testimonials";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -10,6 +11,7 @@ export default function PortfolioPage() {
   return (
     <main>
       <PortfolioBanner />
+      <Testimonials />
     </main>
   );
 }
