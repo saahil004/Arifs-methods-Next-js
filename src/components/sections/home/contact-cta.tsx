@@ -36,7 +36,7 @@ const item: Variants = {
 
 export default function ContactCta() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
+    <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
       <div className="grid items-center gap-16 lg:grid-cols-2">
         <div className="relative">
           <div

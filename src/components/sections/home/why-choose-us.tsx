@@ -37,7 +37,7 @@ export default function WhyChooseUs() {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
+    <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
       <div className="grid items-center gap-16 lg:grid-cols-2">
         <motion.div variants={container} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
           <motion.p
@@ -101,14 +101,13 @@ export default function WhyChooseUs() {
             }}
           />
           <div className="absolute inset-0 -z-10 -translate-x-6 translate-y-6 rounded-3xl bg-amber/10" />
-          <div className="relative overflow-hidden rounded-3xl">
+          <div className="relative aspect-4/5 overflow-hidden rounded-3xl">
             <Image
               src="/why-choose-us.jpg"
               alt="A tidy study desk with subject books, a notebook and a plant"
-              width={830}
-              height={474}
+              fill
               sizes="(min-width: 1024px) 500px, 90vw"
-              className="h-auto w-full object-cover"
+              className="object-cover"
             />
           </div>
         </motion.div>

@@ -36,7 +36,7 @@ const item: Variants = {
 
 export default function HowItWorks() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-24">
+    <section className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
       <div className="grid items-center gap-16 lg:grid-cols-2">
         <motion.div
           className="relative"
@@ -56,15 +56,18 @@ export default function HowItWorks() {
               backgroundSize: "14px 14px",
             }}
           />
-          <div className="absolute inset-0 -z-10 translate-x-8 translate-y-8 rounded-3xl bg-amber/10" />
-          <div className="relative overflow-hidden rounded-3xl">
+          {/* Offset is smaller below lg on purpose: there the image spans the
+              full content width, so a 32px nudge pushes this panel past the
+              6-unit page gutter and puts a horizontal scrollbar on the whole
+              document. At lg+ the image is only half the row, so there's room. */}
+          <div className="absolute inset-0 -z-10 translate-x-4 translate-y-4 rounded-3xl bg-amber/10 lg:translate-x-8 lg:translate-y-8" />
+          <div className="relative aspect-4/5 overflow-hidden rounded-3xl">
             <Image
               src="/how-it-works.jpg"
               alt="Study desk with O & A Level books, past papers and a goals notebook"
-              width={768}
-              height={512}
+              fill
               sizes="(min-width: 1024px) 500px, 90vw"
-              className="h-auto w-full object-cover"
+              className="object-cover"
             />
           </div>
         </motion.div>
