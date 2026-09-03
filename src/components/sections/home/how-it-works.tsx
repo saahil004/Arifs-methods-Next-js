@@ -45,14 +45,18 @@ export default function HowItWorks() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
+          {/* Sits clearly outside the photo's top-left corner rather than
+              tucked behind it — the image wrapper below is positioned and
+              comes later in the DOM, so anything overlapping it is painted
+              over and the decoration reads as a stray 4px sliver. */}
           <div
-            className="absolute -left-4 -top-4 h-32 w-32 text-amber/50"
+            className="absolute -left-10 -top-10 h-44 w-36 text-amber/50"
             style={{
               backgroundImage: "radial-gradient(currentColor 1.5px, transparent 1.5px)",
               backgroundSize: "14px 14px",
             }}
           />
-          <div className="absolute inset-0 -z-10 translate-x-6 translate-y-6 rounded-3xl bg-amber/10" />
+          <div className="absolute inset-0 -z-10 translate-x-8 translate-y-8 rounded-3xl bg-amber/10" />
           <div className="relative overflow-hidden rounded-3xl">
             <Image
               src="/how-it-works.jpg"
@@ -78,7 +82,7 @@ export default function HowItWorks() {
             <span className="h-px w-6 bg-amber" />
             How It Works
           </motion.p>
-          <motion.h2 variants={item} className="max-w-md text-3xl font-extrabold leading-tight text-navy sm:text-4xl">
+          <motion.h2 variants={item} className="max-w-lg text-4xl font-extrabold leading-tight text-navy sm:text-5xl">
             Three simple steps to getting started.
           </motion.h2>
 
