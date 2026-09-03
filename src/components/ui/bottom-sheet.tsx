@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLenis } from "lenis/react";
 import { X } from "lucide-react";
 
 // Public-site equivalent of the admin panel's AdminModal/AdminDrawer pair —
@@ -19,6 +20,9 @@ export default function BottomSheet({
   title?: string;
   children: React.ReactNode;
 }) {
+  // undefined wherever there's no Lenis (mobile, and the admin panel).
+  const lenis = useLenis();
+
   useEffect(() => {
     if (!isOpen) return;
     function handleEscape(e: KeyboardEvent) {
@@ -27,11 +31,16 @@ export default function BottomSheet({
 
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
+    // Lenis drives the scroll itself via rAF and ignores the overflow lock
+    // above, so it has to be stopped explicitly or the page keeps moving
+    // behind the sheet.
+    lenis?.stop();
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
+      lenis?.start();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, lenis]);
 
   return (
     <AnimatePresence>
@@ -46,6 +55,9 @@ export default function BottomSheet({
             onClick={onClose}
           />
           <motion.div
+            // Lets wheel events inside the sheet scroll it natively rather
+            // than being swallowed by Lenis and moving the page underneath.
+            data-lenis-prevent
             className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:p-8"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}

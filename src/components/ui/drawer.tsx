@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLenis } from "lenis/react";
 import { X } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
@@ -17,6 +18,8 @@ export default function Drawer({
   children: React.ReactNode;
 }) {
   const offset = place === "right" ? "100%" : "-100%";
+  // undefined wherever there's no Lenis (mobile, and the whole admin panel).
+  const lenis = useLenis();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,11 +29,16 @@ export default function Drawer({
 
     document.addEventListener("keydown", handleEscape);
     document.body.style.overflow = "hidden";
+    // Lenis drives the scroll itself via rAF, so it ignores the overflow
+    // lock above entirely and would keep scrolling the page behind the
+    // drawer. It has to be stopped explicitly.
+    lenis?.stop();
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
+      lenis?.start();
     };
-  }, [isOpen, close]);
+  }, [isOpen, close, lenis]);
 
   return (
     <AnimatePresence>
@@ -46,6 +54,10 @@ export default function Drawer({
           />
 
           <motion.aside
+            // Tells Lenis to leave wheel events inside the panel alone, so
+            // this scrolls natively instead of Lenis swallowing them and
+            // scrolling the page underneath.
+            data-lenis-prevent
             className={`fixed z-50 h-full w-full max-w-sm overflow-y-auto bg-[#1b1e27] p-8 text-white shadow-2xl ${
               place === "right" ? "top-0 right-0" : "top-0 left-0"
             }`}
