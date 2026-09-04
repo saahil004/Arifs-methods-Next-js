@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import ContactBanner from "./contact-banner";
-import ContactCard from "./contact-card";
-import ContactForm from "./contact-form";
+import ContactBanner from "@/components/sections/contact/contact-banner";
+import ContactCard from "@/components/sections/contact/contact-card";
+import ContactForm from "@/components/sections/contact/contact-form";
 
 export const metadata: Metadata = {
   title: "Contact",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageBanner from "@/components/ui/page-banner";
-import TermsContent from "./terms-content";
+import TermsContent from "@/components/sections/terms/terms-content";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",

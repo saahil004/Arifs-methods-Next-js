@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PortfolioBanner from "@/components/sections/portfolio/portfolio-banner";
 import AboutArif from "@/components/sections/portfolio/about-arif";
+import WhatWeDo from "@/components/sections/portfolio/what-we-do";
 import Testimonials from "@/components/sections/portfolio/testimonials";
 import ScrollReveal from "@/components/sections/portfolio/scroll-reveal";
 
@@ -14,6 +15,7 @@ export default function PortfolioPage() {
     <main>
       <PortfolioBanner />
       <AboutArif />
+      <WhatWeDo />
       <Testimonials />
       <ScrollReveal />
     </main>
