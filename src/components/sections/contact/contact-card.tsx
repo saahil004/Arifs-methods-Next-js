@@ -35,7 +35,14 @@ export default function ContactCard() {
     // (auto) z-index. Without this, the banner painted on top of this card
     // in the overlapping region, despite coming first in the markup.
     <section className="relative z-10 mx-auto max-w-5xl px-6 pb-20">
-      <div className="-mt-40 grid overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
+      {/* The "Find Us" nav anchor sits on the card, not the <section>: the
+          section's flow position is 160px below where the card actually
+          starts (-mt-40 pulls it up over the banner), so anchoring the
+          section would leave the card off the top of the screen. */}
+      <div
+        id="find-us"
+        className="-mt-40 grid scroll-mt-24 overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2"
+      >
         <div className="relative min-h-80 lg:min-h-full">
           <iframe
             src={`https://www.google.com/maps?q=${MAP_QUERY}&output=embed`}

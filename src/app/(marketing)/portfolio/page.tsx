@@ -4,6 +4,8 @@ import AboutArif from "@/components/sections/portfolio/about-arif";
 import WhatWeDo from "@/components/sections/portfolio/what-we-do";
 import Testimonials from "@/components/sections/portfolio/testimonials";
 import ScrollReveal from "@/components/sections/portfolio/scroll-reveal";
+import OurApproach from "@/components/sections/portfolio/our-approach";
+import BookCta from "@/components/sections/portfolio/book-cta";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -16,8 +18,10 @@ export default function PortfolioPage() {
       <PortfolioBanner />
       <AboutArif />
       <WhatWeDo />
-      <Testimonials />
+      <OurApproach />
       <ScrollReveal />
+      <Testimonials />
+      <BookCta />
     </main>
   );
 }

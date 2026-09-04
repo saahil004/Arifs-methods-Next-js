@@ -18,8 +18,8 @@ const FACTS = [
 
 export default function AboutArif() {
   return (
-    <section className="bg-white py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-6">
+    <section id="about-arif" className="scroll-mt-24 bg-white py-20 sm:py-28">
+      <div className="mx-auto max-w-6xl px-6">
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

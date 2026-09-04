@@ -64,7 +64,7 @@ export default function PortfolioBanner() {
           transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
           className="border-t border-white/20"
         >
-          <div className="mx-auto grid max-w-7xl items-center gap-8 px-6 py-8 lg:grid-cols-[auto_1fr_auto]">
+          <div className="mx-auto grid max-w-6xl items-center gap-8 px-6 py-8 lg:grid-cols-[auto_1fr_auto]">
             <div className="flex items-center gap-4 rounded-2xl bg-black/40 p-3 backdrop-blur-sm">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
                 <Image src="/why-choose-us.jpg" alt="" fill sizes="64px" className="object-cover" />

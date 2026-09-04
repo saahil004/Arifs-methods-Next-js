@@ -14,7 +14,7 @@ export default function ContactPage() {
       <ContactBanner title="Get in Touch" breadcrumb={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
       <ContactCard />
 
-      <section className="mx-auto max-w-2xl px-6 py-20 text-center">
+      <section id="send-a-message" className="mx-auto max-w-2xl scroll-mt-24 px-6 py-20 text-center">
         <p className="mb-3 flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest text-amber">
           <span className="h-px w-6 bg-amber" />
           Get In Touch

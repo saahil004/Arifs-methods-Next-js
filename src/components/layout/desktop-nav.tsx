@@ -31,6 +31,10 @@ export default function DesktopNav() {
     <nav className="hidden md:flex md:gap-8 lg:gap-9">
       {links.map((link) => {
         const hasMega = !!link.groups?.length;
+        // Simple one-level dropdown of in-page section links, as opposed to
+        // the two-level mega menu Courses uses.
+        const hasChildren = !hasMega && !!link.children?.length;
+        const hasDropdown = hasMega || hasChildren;
         const isOpen = openItem === link.label;
         const activeGroupData = link.groups?.find((g) => g.title === activeGroup);
 
@@ -38,15 +42,15 @@ export default function DesktopNav() {
           <div
             key={link.href}
             className="relative"
-            onMouseEnter={() => hasMega && setOpenItem(link.label)}
+            onMouseEnter={() => hasDropdown && setOpenItem(link.label)}
             onMouseLeave={() => {
-              if (hasMega) {
+              if (hasDropdown) {
                 setOpenItem(null);
                 setActiveGroup(null);
               }
             }}
           >
-            {hasMega ? (
+            {hasDropdown ? (
               <Link
                 className={`${UNDERLINE} flex items-center gap-1 text-[17px] font-bold transition-colors ${isOpen ? "text-amber" : white ? "text-white hover:text-amber" : "text-navy hover:text-amber"
                   }`}
@@ -66,6 +70,34 @@ export default function DesktopNav() {
               >
                 {link.label}
               </Link>
+            )}
+
+            {hasChildren && (
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full left-0 z-50 mt-4 w-56 rounded-2xl bg-white p-4 shadow-xl"
+                  >
+                    <ul className="space-y-1">
+                      {link.children!.map((child) => (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            onClick={() => setOpenItem(null)}
+                            className="block rounded-xl px-3 py-2 text-[15px] font-semibold text-navy transition-colors hover:text-amber"
+                          >
+                            {child.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             )}
 
             {hasMega && (

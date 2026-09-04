@@ -1,9 +1,8 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
-import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
-import { useHeaderTheme } from "@/components/layout/header-theme";
+import { motion } from "framer-motion";
+import PinnedSwipe from "@/components/ui/pinned-swipe";
 
 // TODO: the photos are placeholders reused from elsewhere on the site —
 // swap for real shots of the academy when they exist.
@@ -36,8 +35,8 @@ const ITEMS = [
 
 export default function WhatWeDo() {
   return (
-    <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 pt-20 sm:pt-28">
+    <section id="what-we-do" className="scroll-mt-24 bg-white">
+      <div className="mx-auto max-w-6xl px-6 pt-20 sm:pt-28">
         <p className="mb-3 flex items-center gap-2 text-sm font-bold tracking-widest text-amber uppercase">
           <span className="h-px w-6 bg-amber" />
           What We Do
@@ -54,68 +53,33 @@ export default function WhatWeDo() {
 }
 
 // lg and up: the same pinned horizontal swipe the home page's subject cards
-// use — four viewport-sized panels dragged sideways by vertical scroll.
+// use, via the shared PinnedSwipe — this file only supplies the panels.
 function DesktopCards() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const { setHeaderHidden } = useHeaderTheme();
-
-  const smoothed = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  // Percentages of the track's own width, so the scrollbar can't cause drift.
-  const x = useTransform(smoothed, [0, 1], ["0%", "-75%"]);
-
-  // Progress sits strictly between 0 and 1 exactly while the section is
-  // pinned, which is when a header bar floating over a full-bleed coloured
-  // card looks like a mistake. Only writes on the flip, not every frame.
-  const pinnedRef = useRef(false);
-  useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    const pinned = progress > 0 && progress < 1;
-    if (pinned === pinnedRef.current) return;
-    pinnedRef.current = pinned;
-    setHeaderHidden(pinned);
-  });
-
   return (
-    <div ref={sectionRef} className="relative mt-14 hidden h-[400vh] lg:block">
-      <div className="sticky top-0 h-screen overflow-hidden">
-        <motion.div style={{ x }} className="flex h-full w-[400%]">
-          {ITEMS.map((item, i) => (
-            <div
-              key={item.title}
-              className={`flex h-full w-1/4 shrink-0 items-center ${
-                i % 2 === 0 ? "bg-navy text-white" : "bg-amber text-navy"
-              }`}
-            >
-              <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
-                <div>
-                  <p
-                    className={`font-display text-8xl leading-none ${
-                      i % 2 === 0 ? "text-white/25" : "text-navy/25"
-                    }`}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </p>
-                  <h3 className="mt-8 text-4xl leading-tight font-extrabold xl:text-5xl">{item.title}</h3>
-                  <p className={`mt-6 max-w-lg leading-relaxed ${i % 2 === 0 ? "text-white/70" : "text-navy/70"}`}>
-                    {item.description}
-                  </p>
-                </div>
-
-                <div className="relative aspect-4/3 w-full overflow-hidden rounded-3xl shadow-2xl">
-                  <Image
-                    src={item.image}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 45vw, 90vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
+    <PinnedSwipe className="mt-14">
+      {ITEMS.map((item, i) => (
+        <div
+          key={item.title}
+          className={`flex h-full items-center ${i % 2 === 0 ? "bg-navy text-white" : "bg-amber text-navy"}`}
+        >
+          <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
+            <div>
+              <p className={`font-display text-8xl leading-none ${i % 2 === 0 ? "text-white/25" : "text-navy/25"}`}>
+                {String(i + 1).padStart(2, "0")}
+              </p>
+              <h3 className="mt-8 text-4xl leading-tight font-extrabold xl:text-5xl">{item.title}</h3>
+              <p className={`mt-6 max-w-lg leading-relaxed ${i % 2 === 0 ? "text-white/70" : "text-navy/70"}`}>
+                {item.description}
+              </p>
             </div>
-          ))}
-        </motion.div>
-      </div>
-    </div>
+
+            <div className="relative aspect-4/3 w-full overflow-hidden rounded-3xl shadow-2xl">
+              <Image src={item.image} alt="" fill sizes="(min-width: 1024px) 45vw, 90vw" className="object-cover" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </PinnedSwipe>
   );
 }
 

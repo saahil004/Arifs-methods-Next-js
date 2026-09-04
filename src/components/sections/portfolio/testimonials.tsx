@@ -40,9 +40,9 @@ export default function Testimonials() {
 
   return (
     // One viewport of scroll per card, plus one to read the last one on.
-    <section ref={sectionRef} className="relative h-[400vh] bg-white">
+    <section id="testimonials" ref={sectionRef} className="relative h-[400vh] scroll-mt-24 bg-white">
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
           <p className="text-sm font-bold uppercase tracking-widest text-navy/40">Testimonials</p>
           <p className="text-sm font-bold uppercase tracking-widest text-navy/40">They love us</p>
         </div>

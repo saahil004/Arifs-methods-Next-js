@@ -3,19 +3,14 @@
 import { useState } from "react";
 import type { Teacher } from "@/lib/admin-api";
 import BottomSheet from "@/components/ui/bottom-sheet";
+import SnapCarousel from "@/components/ui/snap-carousel";
 
-// The layout below is built for a 4-up row (see the flex-basis calc on each
-// card) — capping here rather than in the page keeps that assumption next to
-// the component that actually depends on it.
-const MAX_TEACHERS = 4;
-
-export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[] }) {
-  const teachers = allTeachers.slice(0, MAX_TEACHERS);
+export default function Faculty({ teachers }: { teachers: Teacher[] }) {
   const [selected, setSelected] = useState<Teacher | null>(null);
   if (teachers.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-white py-16 sm:py-20">
+    <section id="faculty" className="relative scroll-mt-24 overflow-hidden bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-6 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icons/teams.svg" alt="" className="mx-auto h-14 w-auto" />
@@ -34,21 +29,22 @@ export default function Faculty({ teachers: allTeachers }: { teachers: Teacher[]
           className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-amber/15"
         />
 
-        {/* flex-wrap + fixed card widths, not a grid: a grid with fewer
-            teachers than columns leaves the last row lopsided against the
-            left edge — this centers whatever number of cards there are
-            instead of assuming the roster is always a multiple of 4.
-            relative z-10 is required here — the two decorative circles
-            above are position: absolute, and CSS paints positioned
-            elements above non-positioned siblings regardless of DOM order,
-            even at the same (auto) z-index. Without this the circles
-            painted on top of the cards despite coming first in the markup
-            (the same bug fixed earlier on the Contact page's card). */}
-        <div className="relative z-10 flex flex-wrap justify-center gap-6">
+        {/* relative z-10 is required here — the two decorative circles above
+            are position: absolute, and CSS paints positioned elements above
+            non-positioned siblings regardless of DOM order, even at the same
+            (auto) z-index. Without this the circles painted on top of the
+            cards despite coming first in the markup (the same bug fixed
+            earlier on the Contact page's card).
+
+            The roster is no longer capped: however many teachers an admin
+            adds, four fill a page at lg and the rest page across. Arrows and
+            dots only appear once there's a second page, so a small faculty
+            still reads as a plain row of cards. */}
+        <SnapCarousel label="Our teachers" className="relative z-10">
           {teachers.map((teacher) => (
             <TeacherCard key={teacher.id} teacher={teacher} onReadMore={() => setSelected(teacher)} />
           ))}
-        </div>
+        </SnapCarousel>
       </div>
 
       <BottomSheet isOpen={selected !== null} onClose={() => setSelected(null)} title={selected?.name}>
@@ -68,7 +64,10 @@ function TeacherCard({ teacher, onReadMore }: { teacher: Teacher; onReadMore: ()
     // flex flex-col + mt-auto on the button below keeps Read More aligned
     // to the same bottom edge across cards regardless of how long a given
     // teacher's name/subjects/bio preview runs.
-    <div className="flex w-full flex-col rounded-2xl bg-white p-8 shadow-[0_4px_30px_rgba(0,0,0,0.06)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
+    // shrink-0 + snap-start: the card is a page-sized item in a scroll-snap
+    // track now, not a wrapping flex child, so it must hold its width and
+    // offer itself as a snap point.
+    <div className="flex w-full shrink-0 snap-start flex-col rounded-2xl bg-white p-8 shadow-[0_4px_30px_rgba(0,0,0,0.06)] sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
       <TeacherAvatar teacher={teacher} className="h-22 w-22 text-2xl" />
       <h3 className="mt-8 text-xl font-bold text-navy">{teacher.name}</h3>
       {subjects && <p className="mt-2 text-sm font-bold tracking-wide text-navy/40 uppercase">{subjects}</p>}

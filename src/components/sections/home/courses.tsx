@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useMediaQuery } from "@/lib/use-media-query";
-import { useHeaderTheme } from "@/components/layout/header-theme";
+import PinnedSwipe from "@/components/ui/pinned-swipe";
 import { fadeUpStagger } from "@/lib/motion";
 
 // Deliberately static: these four are the academy's core O Level offering and
@@ -133,53 +133,16 @@ export default function Courses() {
   );
 }
 
-// lg and up: the section is four viewports tall, with one viewport-sized
-// panel pinned inside it. Scrolling down that height drives the card track
-// sideways instead, so each subject swipes to the next as you scroll —
-// hence h-400vh for four cards (three card-widths of travel over 300vh).
+// lg and up: one viewport-sized card per subject, swiped sideways by
+// vertical scroll. The pinning/track mechanic lives in PinnedSwipe, shared
+// with the portfolio page's What We Do cards; this only supplies the cards.
 function CourseScrollCards() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
-  const { setHeaderHidden } = useHeaderTheme();
-
-  // Progress is strictly between 0 and 1 exactly while the section is
-  // pinned, so that doubles as "a card currently fills the viewport" —
-  // which is when a white header bar floating over it looks like a mistake.
-  // Only writes state on the flip, not on every scroll frame.
-  const pinnedRef = useRef(false);
-  useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    const pinned = progress > 0 && progress < 1;
-    if (pinned === pinnedRef.current) return;
-    pinnedRef.current = pinned;
-    setHeaderHidden(pinned);
-  });
-
-  // Leaving the page mid-section would otherwise strand the header offscreen.
-  useEffect(() => () => setHeaderHidden(false), [setHeaderHidden]);
-
-  // The spring takes the edge off the last few pixels of scroll input. Lenis
-  // already smooths the wheel itself, so this is deliberately stiff — enough
-  // to kill jitter, not enough to make the cards lag behind the scroll.
-  const smoothed = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-
-  // Percentages of the track's own width, not vw: the track is 400% of the
-  // pinned panel, so -75% of it is exactly three cards. Using vw here would
-  // drift by the scrollbar's width.
-  const x = useTransform(smoothed, [0, 1], ["0%", "-75%"]);
-
   return (
-    <div ref={sectionRef} className="relative mt-14 hidden h-[400vh] lg:block">
-      {/* Cards fill the pinned viewport rather than sitting shorter inside
-          it — the subject artwork is square, and at a reduced card height it
-          no longer had the room to sit at a sensible size beside the copy. */}
-      <div className="sticky top-0 h-screen overflow-hidden">
-        <motion.div style={{ x }} className="flex h-full w-[400%]">
-          {COURSES.map((course, i) => (
-            <CourseCard key={course.code} course={course} index={i} />
-          ))}
-        </motion.div>
-      </div>
-    </div>
+    <PinnedSwipe className="mt-14">
+      {COURSES.map((course, i) => (
+        <CourseCard key={course.code} course={course} index={i} />
+      ))}
+    </PinnedSwipe>
   );
 }
 
@@ -189,10 +152,11 @@ function CourseCard({ course, index }: { course: (typeof COURSES)[number]; index
   // of state without inventing a third or fourth hue.
   const isNavy = index % 2 === 0;
 
+  // h-full: the card fills the pinned viewport rather than sitting shorter
+  // inside it — the subject artwork is square, and at a reduced card height
+  // it no longer had the room to sit at a sensible size beside the copy.
   return (
-    <div
-      className={`flex h-full w-1/4 shrink-0 items-center ${isNavy ? "bg-navy text-white" : "bg-amber text-navy"}`}
-    >
+    <div className={`flex h-full items-center ${isNavy ? "bg-navy text-white" : "bg-amber text-navy"}`}>
       <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
         <div>
           <p className={`font-display text-8xl leading-none ${isNavy ? "text-white/25" : "text-navy/25"}`}>

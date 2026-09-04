@@ -34,7 +34,7 @@ const item: Variants = {
 
 export default function OurMethod() {
   return (
-    <section className="bg-cream py-16 sm:py-20">
+    <section id="our-method" className="scroll-mt-24 bg-cream py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-6 text-center">
         <p className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-widest text-amber">
           <span className="h-px w-6 bg-amber" />

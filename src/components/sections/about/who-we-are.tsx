@@ -23,7 +23,7 @@ const item: Variants = {
 
 export default function WhoWeAre() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+    <section id="who-we-are" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-16 sm:py-20">
       <div className="grid items-center gap-16 lg:grid-cols-2">
         <motion.div
           className="order-2 lg:order-1"

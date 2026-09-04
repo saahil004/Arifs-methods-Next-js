@@ -4,8 +4,10 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import CountUp from "@/components/ui/count-up";
 
+// Leads into the stats below it, so it reads as "here is what those numbers
+// actually are" rather than as a second, unrelated pull quote.
 const HEADING =
-  "Every grade on this page belongs to a student who sat in a classroom in Clifton, worked through the syllabus topic by topic, and walked into the exam ready.";
+  "The numbers below are not a marketing claim. They are years of the same routine: small batches, one topic finished before the next begins, and past papers marked the way an examiner marks them.";
 
 // UNVERIFIED FIGURES: students taught and years teaching were filled in on
 // request as plausible placeholders — they are not drawn from any record of
@@ -30,7 +32,11 @@ export default function ScrollReveal() {
   const words = HEADING.split(" ");
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-navy py-24 sm:py-32">
+    <section
+      ref={sectionRef}
+      id="by-the-numbers"
+      className="relative scroll-mt-24 overflow-hidden bg-navy py-24 sm:py-32"
+    >
       {/* CSS background rather than next/image so lg:bg-fixed can attach,
           same as the other banners. TODO: swap for a real photo. */}
       <div
@@ -41,7 +47,7 @@ export default function ScrollReveal() {
 
       <div className="relative z-10">
         <div className="px-6">
-          <p className="mx-auto max-w-7xl text-3xl leading-[1.2] font-extrabold text-white sm:text-4xl lg:text-5xl xl:text-6xl">
+          <p className="mx-auto max-w-6xl text-3xl leading-[1.2] font-extrabold text-white sm:text-4xl lg:text-5xl xl:text-6xl">
             {words.map((word, i) => (
               <Word key={i} progress={scrollYProgress} index={i} total={words.length}>
                 {word}
@@ -50,20 +56,27 @@ export default function ScrollReveal() {
           </p>
         </div>
 
+        {/* Two columns on phones, per the mobile reference — with the odd
+            one out spanning the full width so it doesn't leave a hole. The
+            number and its description sit stacked at that size and only pair
+            up side by side once there's a column wide enough for both. */}
         <div className="mt-20 border-t border-white/20">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-10 md:grid-cols-3">
-            {STATS.map((stat) => (
-              <div key={stat.label}>
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-6 pt-10 md:grid-cols-3 md:gap-10">
+            {STATS.map((stat, i) => (
+              <div
+                key={stat.label}
+                className={i === STATS.length - 1 && STATS.length % 2 === 1 ? "col-span-2 md:col-span-1" : ""}
+              >
                 <span className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
                   {stat.label}
                 </span>
-                <div className="mt-4 flex items-end gap-4">
+                <div className="mt-4 flex flex-col gap-2 lg:flex-row lg:items-end lg:gap-4">
                   <CountUp
                     value={stat.value}
                     suffix={stat.suffix}
                     className="text-4xl font-extrabold text-white lg:text-5xl"
                   />
-                  <p className="max-w-44 text-sm leading-snug text-white/70">{stat.description}</p>
+                  <p className="text-sm leading-snug text-white/70 lg:max-w-44">{stat.description}</p>
                 </div>
               </div>
             ))}
