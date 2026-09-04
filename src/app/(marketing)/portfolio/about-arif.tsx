@@ -3,19 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import CountUp from "@/components/ui/count-up";
 
-// Drawn from what the site already asserts: Karachi-based, founder, an
-// experienced Mathematics educator known for a step-by-step approach,
-// with 4024 and 4037 as his own subjects, teaching Cambridge syllabuses.
-//
-// The two numeric values are the only things here that need Sir Arif's
-// input — a year and a headcount are specific factual claims, and a
-// wrong one on his own site is worse than a blank. Everything else is
-// finished copy.
+// UNVERIFIED FIGURES: the years and student count below were filled in on
+// request as plausible placeholders, not from any record of the academy's
+// actual numbers. They are public claims about a real business — confirm
+// them with Sir Arif and correct them before launch. "Cambridge" is real:
+// every course code on the site is a Cambridge syllabus.
 const FACTS = [
-  { label: "Teaching since", value: "20XX", needsInput: true },
-  { label: "Students taught", value: "000+", needsInput: true },
-  { label: "Curriculum", value: "Cambridge", needsInput: false },
+  { label: "Years teaching", value: 17, suffix: "+" },
+  { label: "Students taught", value: 1200, suffix: "+" },
+  { label: "Curriculum", text: "Cambridge" },
 ];
 
 export default function AboutArif() {
@@ -63,8 +61,8 @@ export default function AboutArif() {
               {FACTS.map((item) => (
                 <div key={item.label}>
                   <dt className="text-sm text-navy/50">{item.label}</dt>
-                  <dd className={`mt-1 text-xl font-extrabold ${item.needsInput ? "text-navy/30" : "text-navy"}`}>
-                    {item.value}
+                  <dd className="mt-1 text-xl font-extrabold text-navy">
+                    {item.text ?? <CountUp value={item.value!} suffix={item.suffix} />}
                   </dd>
                 </div>
               ))}

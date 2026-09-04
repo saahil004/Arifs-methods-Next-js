@@ -2,18 +2,20 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import CountUp from "@/components/ui/count-up";
 
 const HEADING =
   "Every grade on this page belongs to a student who sat in a classroom in Clifton, worked through the syllabus topic by topic, and walked into the exam ready.";
 
-// PLACEHOLDER FIGURES — these are not real numbers. A stats row like this
-// reads as evidence, and invented evidence about results is exactly what a
-// parent would weigh when choosing a tutor. Replace each value with a real,
-// checkable figure (or drop the stat) before this page goes live.
+// UNVERIFIED FIGURES: students taught and years teaching were filled in on
+// request as plausible placeholders — they are not drawn from any record of
+// the academy's actual numbers, and a stats row like this reads as evidence
+// to a parent choosing a tutor. Confirm and correct both before launch.
+// Subjects offered is real: eight courses exist in the live course list.
 const STATS = [
-  { label: "Students taught", value: "—", description: "Replace with a real figure." },
-  { label: "Subjects offered", value: "—", description: "Replace with a real figure." },
-  { label: "Years teaching", value: "—", description: "Replace with a real figure." },
+  { label: "Students taught", value: 1200, suffix: "+", description: "Across O & A Level subjects since 2009." },
+  { label: "Subjects offered", value: 8, suffix: "", description: "Cambridge O & A Level syllabuses." },
+  { label: "Years teaching", value: 17, suffix: "+", description: "Mathematics, from the first batch onwards." },
 ];
 
 export default function ScrollReveal() {
@@ -54,7 +56,11 @@ export default function ScrollReveal() {
                   {stat.label}
                 </span>
                 <div className="mt-4 flex items-end gap-4">
-                  <p className="text-4xl font-extrabold text-white lg:text-5xl">{stat.value}</p>
+                  <CountUp
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    className="text-4xl font-extrabold text-white lg:text-5xl"
+                  />
                   <p className="max-w-44 text-sm leading-snug text-white/70">{stat.description}</p>
                 </div>
               </div>
