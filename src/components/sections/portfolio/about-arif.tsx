@@ -25,7 +25,11 @@ export default function AboutArif() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="max-w-6xl text-3xl leading-[1.15] font-extrabold text-navy sm:text-4xl lg:text-5xl xl:text-6xl"
+          // Regular weight and the full container width, per the reference —
+          // the statement carries at that size without being bold, and
+          // spanning the container keeps its left edge flush with the
+          // "(About Sir Arif)" label and body copy below it.
+          className="text-3xl leading-[1.15] font-normal text-navy sm:text-4xl lg:text-5xl xl:text-6xl"
         >
           Every result on this page traces back to one classroom, one teacher, and a method built over years of
           watching where students actually get stuck.

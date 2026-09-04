@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import PortfolioBanner from "./portfolio-banner";
-import AboutArif from "./about-arif";
-import Testimonials from "./testimonials";
-import ScrollReveal from "./scroll-reveal";
+import PortfolioBanner from "@/components/sections/portfolio/portfolio-banner";
+import AboutArif from "@/components/sections/portfolio/about-arif";
+import Testimonials from "@/components/sections/portfolio/testimonials";
+import ScrollReveal from "@/components/sections/portfolio/scroll-reveal";
 
 export const metadata: Metadata = {
   title: "Portfolio",

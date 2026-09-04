@@ -20,25 +20,27 @@ const STATS = [
 
 export default function ScrollReveal() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  // The reveal is driven by how far through the section you've scrolled, and
-  // finishes a little before the end so the finished sentence sits readable
-  // for a moment rather than completing on the very last pixel.
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+  // Not pinned — the section scrolls past like any other. The reveal is
+  // keyed to its travel through the viewport instead: it starts lighting up
+  // as the section's top reaches ~85% down the screen and is finished by the
+  // time its bottom passes ~60%, so the sentence completes while it's still
+  // comfortably in view rather than on the way out.
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start 0.85", "end 0.6"] });
 
   const words = HEADING.split(" ");
 
   return (
-    <section ref={sectionRef} className="relative h-[220vh] bg-navy">
-      <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
-        {/* CSS background rather than next/image so lg:bg-fixed can attach,
-            same as the other banners. TODO: swap for a real photo. */}
-        <div
-          className="absolute inset-0 bg-cover bg-center lg:bg-fixed"
-          style={{ backgroundImage: "url('/register.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-navy/70" />
+    <section ref={sectionRef} className="relative overflow-hidden bg-navy py-24 sm:py-32">
+      {/* CSS background rather than next/image so lg:bg-fixed can attach,
+          same as the other banners. TODO: swap for a real photo. */}
+      <div
+        className="absolute inset-0 bg-cover bg-center lg:bg-fixed"
+        style={{ backgroundImage: "url('/register.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-navy/70" />
 
-        <div className="relative z-10 flex flex-1 items-center px-6 pt-24">
+      <div className="relative z-10">
+        <div className="px-6">
           <p className="mx-auto max-w-7xl text-3xl leading-[1.2] font-extrabold text-white sm:text-4xl lg:text-5xl xl:text-6xl">
             {words.map((word, i) => (
               <Word key={i} progress={scrollYProgress} index={i} total={words.length}>
@@ -48,8 +50,8 @@ export default function ScrollReveal() {
           </p>
         </div>
 
-        <div className="relative z-10 border-t border-white/20">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-10 md:grid-cols-3">
+        <div className="mt-20 border-t border-white/20">
+          <div className="mx-auto grid max-w-7xl gap-10 px-6 pt-10 md:grid-cols-3">
             {STATS.map((stat) => (
               <div key={stat.label}>
                 <span className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
