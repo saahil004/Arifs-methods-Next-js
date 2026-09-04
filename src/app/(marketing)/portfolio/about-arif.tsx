@@ -4,20 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-// Everything below is drawn from what the site already states about Sir
-// Arif — Karachi-based, founder, Mathematics educator, known for a
-// step-by-step approach, flagship subjects 4024 and 4037.
+// Drawn from what the site already asserts: Karachi-based, founder, an
+// experienced Mathematics educator known for a step-by-step approach,
+// with 4024 and 4037 as his own subjects, teaching Cambridge syllabuses.
 //
-// What is deliberately NOT here: years of experience, previous schools,
-// qualifications, examiner status, any named institution. Those are
-// professional credentials belonging to a real, named person, and
-// inventing them would be putting a fabricated CV on his own website.
-// The AFFILIATIONS list below is a placeholder for exactly that reason —
-// fill it in with the real ones (or delete the block) before launch.
-const AFFILIATIONS = [
-  { label: "Years teaching", value: "—" },
-  { label: "Qualification", value: "—" },
-  { label: "Affiliation", value: "—" },
+// The two numeric values are the only things here that need Sir Arif's
+// input — a year and a headcount are specific factual claims, and a
+// wrong one on his own site is worse than a blank. Everything else is
+// finished copy.
+const FACTS = [
+  { label: "Teaching since", value: "20XX", needsInput: true },
+  { label: "Students taught", value: "000+", needsInput: true },
+  { label: "Curriculum", value: "Cambridge", needsInput: false },
 ];
 
 export default function AboutArif() {
@@ -46,20 +44,28 @@ export default function AboutArif() {
             className="max-w-xl"
           >
             <p className="leading-relaxed text-navy/70">
-              Sir Arif founded Arif&apos;s Methods in Karachi to teach O &amp; A Level Mathematics the way he thought
-              it should be taught — step by step, breaking a topic down until it genuinely clicks rather than rushing
-              to cover the syllabus.
+              Sir Arif has spent his career teaching O &amp; A Level Mathematics, and founded Arif&apos;s Methods in
+              Karachi to teach it the way he thought it should be taught — step by step, breaking a topic down until
+              it genuinely clicks rather than racing to cover the syllabus before the exam.
             </p>
             <p className="mt-4 leading-relaxed text-navy/70">
-              Mathematics (4024) and Additional Mathematics (4037) remain his own subjects and the academy&apos;s
-              flagship, and the same approach now runs across every subject and every tutor here.
+              Mathematics (4024) and Additional Mathematics (4037) are still his own subjects and the academy&apos;s
+              flagship. Years of teaching the same two syllabuses is what the method is built on: he knows which
+              topics students reliably get stuck on, which questions examiners keep returning to, and how to close
+              the gap between the two.
+            </p>
+            <p className="mt-4 leading-relaxed text-navy/70">
+              The academy teaches the Cambridge O &amp; A Level syllabuses, and the tutors he has brought in across
+              Physics, Chemistry and Computer Science all teach to the same approach.
             </p>
 
             <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-navy/10 pt-6">
-              {AFFILIATIONS.map((item) => (
+              {FACTS.map((item) => (
                 <div key={item.label}>
                   <dt className="text-sm text-navy/50">{item.label}</dt>
-                  <dd className="mt-1 text-xl font-extrabold text-navy">{item.value}</dd>
+                  <dd className={`mt-1 text-xl font-extrabold ${item.needsInput ? "text-navy/30" : "text-navy"}`}>
+                    {item.value}
+                  </dd>
                 </div>
               ))}
             </dl>
